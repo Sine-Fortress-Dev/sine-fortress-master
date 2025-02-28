@@ -1159,8 +1159,11 @@ void C_TFRagdoll::OnDataChanged( DataUpdateType_t type )
 {
 	BaseClass::OnDataChanged( type );
 
+	m_iTeamNum = m_iTeam;
+
 	if ( type == DATA_UPDATE_CREATED )
 	{
+
 		bool bCreateRagdoll = true;
 
 		// Get the player.
