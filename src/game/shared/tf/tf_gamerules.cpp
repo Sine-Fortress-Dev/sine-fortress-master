@@ -1445,6 +1445,11 @@ BEGIN_NETWORK_TABLE_NOBASE( CTFGameRules, DT_TFGameRules )
 	RecvPropInt( RECVINFO( m_nForceEscortPushLogic ) ),
 
 	RecvPropBool( RECVINFO( m_bRopesHolidayLightsAllowed ) ),
+
+	RecvPropVector(RECVINFO(m_rgbBlueColor)),
+	RecvPropVector(RECVINFO(m_rgbRedColor)),
+	RecvPropVector(RECVINFO(m_bBlueCustomColor)),
+	RecvPropVector(RECVINFO(m_bRedCustomColor)),
 #else
 
 	SendPropInt( SENDINFO( m_nGameType ), 4, SPROP_UNSIGNED ),
@@ -1514,6 +1519,11 @@ BEGIN_NETWORK_TABLE_NOBASE( CTFGameRules, DT_TFGameRules )
 	SendPropInt( SENDINFO( m_nForceEscortPushLogic ) ),
 
 	SendPropBool( SENDINFO( m_bRopesHolidayLightsAllowed ) ),
+
+	SendPropVector(SENDINFO(m_rgbBlueColor)),
+	SendPropVector(SENDINFO(m_rgbRedColor)),
+	SendPropVector(SENDINFO(m_bBlueCustomColor)),
+	SendPropVector(SENDINFO(m_bRedCustomColor)),
 #endif
 END_NETWORK_TABLE()
 
@@ -1559,6 +1569,11 @@ BEGIN_DATADESC( CTFGameRulesProxy )
 	DEFINE_KEYFIELD( m_bOvertimeAllowedForCTF, FIELD_BOOLEAN, "ctf_overtime" ),
 	DEFINE_KEYFIELD( m_bRopesHolidayLightsAllowed, FIELD_BOOLEAN, "ropes_holiday_lights_allowed" ),
 
+	DEFINE_KEYFIELD(m_bCustomBlueColor, FIELD_BOOLEAN, "has_custom_blue_color"),
+	DEFINE_KEYFIELD(m_bCustomRedColor, FIELD_BOOLEAN, "has_custom_red_color"),
+	DEFINE_KEYFIELD(m_rgbBlueColor, FIELD_COLOR32, "blue_color"),
+	DEFINE_KEYFIELD(m_rgbRedColor, FIELD_COLOR32, "red_color"),
+
 	// Inputs.
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetRedTeamRespawnWaveTime", InputSetRedTeamRespawnWaveTime ),
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetBlueTeamRespawnWaveTime", InputSetBlueTeamRespawnWaveTime ),
@@ -1581,6 +1596,11 @@ BEGIN_DATADESC( CTFGameRulesProxy )
 	DEFINE_INPUTFUNC( FIELD_STRING, "SetCustomUpgradesFile", InputSetCustomUpgradesFile ),
 	DEFINE_INPUTFUNC( FIELD_INTEGER, "SetRoundRespawnFreezeEnabled", InputSetRoundRespawnFreezeEnabled ),
 	DEFINE_INPUTFUNC( FIELD_BOOLEAN, "SetMapForcedTruceDuringBossFight", InputSetMapForcedTruceDuringBossFight ),
+
+	DEFINE_INPUTFUNC(FIELD_VECTOR, "SetBlueTeamColor", InputSetBlueTeamCustomColor),
+	DEFINE_INPUTFUNC(FIELD_VECTOR, "SetRedTeamColor", InputSetRedTeamCustomColor),
+	DEFINE_INPUTFUNC(FIELD_BOOLEAN, "SetBlueTeamCustomColorActive", InputSetBlueTeamCustomColorActive),
+	DEFINE_INPUTFUNC(FIELD_BOOLEAN, "SetRedTeamCustomColorActive", InputSetRedTeamCustomColorActive),
 
 	DEFINE_OUTPUT( m_OnWonByTeam1,	"OnWonByTeam1" ),
 	DEFINE_OUTPUT( m_OnWonByTeam2,	"OnWonByTeam2" ),
@@ -1844,6 +1864,30 @@ void CTFGameRulesProxy::InputSetMapForcedTruceDuringBossFight( inputdata_t &inpu
 	}
 }
 
+void CTFGameRulesProxy::InputSetBlueTeamCustomColor(inputdata_t& inputdata)
+{
+	Vector vecInput;
+	inputdata.value.Vector3D(vecInput);
+	TFGameRules()->SetBlueTeamColor(vecInput);
+}
+
+void CTFGameRulesProxy::InputSetRedTeamCustomColor(inputdata_t& inputdata)
+{
+	Vector vecInput;
+	inputdata.value.Vector3D(vecInput);
+	TFGameRules()->SetRedTeamColor(vecInput);
+}
+
+void CTFGameRulesProxy::InputSetBlueTeamCustomColorActive(inputdata_t& inputdata)
+{
+	TFGameRules()->SetBlueTeamHasCustomColor(inputdata.value.Bool());
+}
+
+void CTFGameRulesProxy::InputSetRedTeamCustomColorActive(inputdata_t& inputdata)
+{
+	TFGameRules()->SetRedTeamHasCustomColor(inputdata.value.Bool());
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -1870,6 +1914,26 @@ void CTFGameRulesProxy::Activate()
 	TFGameRules()->SetRopesHolidayLightsAllowed( m_bRopesHolidayLightsAllowed );
 
 	ListenForGameEvent( "teamplay_round_win" );
+
+	Vector blueColor = Vector(97, 145, 200);
+	Vector redColor = Vector(230, 85, 85);
+	if (m_bCustomBlueColor)
+	{
+		blueColor.x = m_rgbBlueColor.r;
+		blueColor.y = m_rgbBlueColor.g;
+		blueColor.z = m_rgbBlueColor.b;
+	}
+	if (m_bCustomRedColor)
+	{
+		redColor.x = m_rgbRedColor.r;
+		redColor.y = m_rgbRedColor.g;
+		redColor.z = m_rgbRedColor.b;
+	}
+
+	TFGameRules()->SetBlueTeamHasCustomColor(m_bCustomBlueColor);
+	TFGameRules()->SetRedTeamHasCustomColor(m_bCustomRedColor);
+	TFGameRules()->SetBlueTeamColor(blueColor);
+	TFGameRules()->SetRedTeamColor(redColor);
 
 	BaseClass::Activate();
 }
@@ -18492,6 +18556,24 @@ void CTFGameRules::OnDataChanged( DataUpdateType_t updateType )
 	BaseClass::OnDataChanged( updateType );
 
 	m_bRecievedBaseline |= updateType == DATA_UPDATE_CREATED;
+
+	if (updateType == DATA_UPDATE_DATATABLE_CHANGED)
+	{
+		if (m_rgbBlueColorOld != m_rgbBlueColor || m_rgbRedColorOld != m_rgbRedColor ||
+			m_bBlueCustomColorOld != m_bBlueCustomColor || m_bRedCustomColorOld != m_bRedCustomColor)
+		{
+			IGameEvent* event = gameeventmanager->CreateEvent("colors_updated");
+			if (event)
+			{
+				gameeventmanager->FireEventClientSide(event);
+			}
+
+			m_rgbBlueColorOld = m_rgbBlueColor;
+			m_rgbRedColorOld = m_rgbRedColor;
+			m_bBlueCustomColorOld = m_bBlueCustomColor;
+			m_bRedCustomColorOld = m_bRedCustomColor;
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -21880,7 +21962,7 @@ bool CTFGameRules::CanUpgradeWithAttrib( CTFPlayer *pPlayer, int iWeaponSlot, at
 			return ( iWeaponID == TF_WEAPON_GOOGUN );
 		}
 	}
-
+	
 
 	// All weapon related attributes require an item that does damage
 	if ( pUpgrade->nUIGroup == UIGROUP_UPGRADE_ATTACHED_TO_ITEM )

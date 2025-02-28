@@ -206,7 +206,7 @@ $Project "Client (SF)"
 				$File	"tf\vgui\store\v2\tf_store_mapstamps_info_dialog.h"
 			}
 		}
-
+		
 		$Folder "SF"
 		{
 			$Folder "Weapon"
@@ -215,7 +215,7 @@ $Project "Client (SF)"
 				$File	"$SRCDIR\game\shared\sf\tf_weapon_googun.h"
 				$File	"$SRCDIR\game\shared\tf\tf_weapon_crowbar.cpp"
 				$File	"$SRCDIR\game\shared\tf\tf_weapon_crowbar.h"
-		}
+			}
 
 			$File	"$SRCDIR\game\shared\sf\tf_prop_goopuddle.cpp"
 			$File	"$SRCDIR\game\shared\sf\tf_prop_goopuddle.h"
@@ -223,6 +223,8 @@ $Project "Client (SF)"
 			$File	"$SRCDIR\game\shared\sf\tf_projectile_goo.h"
 			$File	"$SRCDIR\game\shared\sf\tf_projectile_energy_laser.cpp"
 			$File	"$SRCDIR\game\shared\sf\tf_projectile_energy_laser.h"
+			$File	"$SRCDIR\game\client\sf\sf_vruksstupiduihack.h"
+			$File	"$SRCDIR\game\client\sf\teamcolorproxy.cpp"
 		}
 
 		$Folder	"TF"

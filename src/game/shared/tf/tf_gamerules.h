@@ -177,6 +177,11 @@ public:
 	void	InputSetRoundRespawnFreezeEnabled( inputdata_t &inputdata );
 	void	InputSetMapForcedTruceDuringBossFight( inputdata_t &inputdata );
 
+	void	InputSetBlueTeamCustomColor(inputdata_t& inputdata);
+	void	InputSetRedTeamCustomColor(inputdata_t& inputdata);
+	void	InputSetBlueTeamCustomColorActive(inputdata_t& inputdata);
+	void	InputSetRedTeamCustomColorActive(inputdata_t& inputdata);
+
 	void	TeamPlayerCountChanged( CTFTeam *pTeam );
 	void	PowerupTeamImbalance( int nTeam );
 	void	StateEnterRoundRunning( void );
@@ -219,6 +224,11 @@ private:
 
 	bool	m_bOvertimeAllowedForCTF;
 	bool	m_bRopesHolidayLightsAllowed;
+
+	bool	m_bCustomBlueColor;
+	bool	m_bCustomRedColor;
+	color32	m_rgbBlueColor;
+	color32	m_rgbRedColor;
 #endif
 
 public: // IGameEventListener Interface
@@ -746,6 +756,28 @@ bool IsCreepWaveMode( void ) const;
 	int GetGameTeamForGCTeam( TF_GC_TEAM nGCTeam );
 	TF_GC_TEAM GetGCTeamForGameTeam( int nGameTeam );
 
+	Vector GetBlueTeamColor(void) { return m_rgbBlueColor; }
+	Vector GetRedTeamColor(void) { return m_rgbRedColor; }
+	bool GetBlueTeamHasCustomColor() { return m_bBlueCustomColor; }
+	bool GetRedTeamHasCustomColor() { return m_bRedCustomColor; }
+	void CTFGameRules::SetBlueTeamHasCustomColor(bool hasCustom)
+	{
+		m_bBlueCustomColor.Set(hasCustom);
+	}
+	void CTFGameRules::SetRedTeamHasCustomColor(bool hasCustom)
+	{
+		m_bRedCustomColor.Set(hasCustom);
+	}
+
+	void CTFGameRules::SetBlueTeamColor(Vector color)
+	{
+		m_rgbBlueColor.Set(color);
+	}
+	void CTFGameRules::SetRedTeamColor(Vector color)
+	{
+		m_rgbRedColor.Set(color);
+	}
+
 	enum ENextMapVotingState
 	{
 		NEXT_MAP_VOTE_STATE_NONE,
@@ -1231,6 +1263,18 @@ private:
 	CNetworkArray( MapDefIndex_t, m_nNextMapVoteOptions, 3 );
 
 	float		m_flCTFCaptureBonusTime;
+
+	CNetworkVar(Vector, m_rgbBlueColor);
+	CNetworkVar(Vector, m_rgbRedColor);
+	CNetworkVar(bool, m_bBlueCustomColor);
+	CNetworkVar(bool, m_bRedCustomColor);
+
+#ifndef GAME_DLL
+	Vector m_rgbBlueColorOld;
+	Vector m_rgbRedColorOld;
+	bool m_bBlueCustomColorOld;
+	bool m_bRedCustomColorOld;
+#endif
 public:
 
 	bool m_bControlSpawnsPerTeam[ MAX_TEAMS ][ MAX_CONTROL_POINTS ];
