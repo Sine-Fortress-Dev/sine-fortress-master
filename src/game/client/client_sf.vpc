@@ -207,6 +207,24 @@ $Project "Client (SF)"
 			}
 		}
 
+		$Folder "SF"
+		{
+			$Folder "Weapon"
+			{
+				$File	"$SRCDIR\game\shared\sf\tf_weapon_googun.cpp"
+				$File	"$SRCDIR\game\shared\sf\tf_weapon_googun.h"
+				$File	"$SRCDIR\game\shared\tf\tf_weapon_crowbar.cpp"
+				$File	"$SRCDIR\game\shared\tf\tf_weapon_crowbar.h"
+		}
+
+			$File	"$SRCDIR\game\shared\sf\tf_prop_goopuddle.cpp"
+			$File	"$SRCDIR\game\shared\sf\tf_prop_goopuddle.h"
+			$File	"$SRCDIR\game\shared\sf\tf_projectile_goo.cpp"
+			$File	"$SRCDIR\game\shared\sf\tf_projectile_goo.h"
+			$File	"$SRCDIR\game\shared\sf\tf_projectile_energy_laser.cpp"
+			$File	"$SRCDIR\game\shared\sf\tf_projectile_energy_laser.h"
+		}
+
 		$Folder	"TF"
 		{
 			$File	"$SRCDIR\game\shared\tf\tf_weapon_passtime_gun.cpp"

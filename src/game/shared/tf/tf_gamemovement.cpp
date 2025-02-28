@@ -77,6 +77,15 @@ ConVar tf_movement_lost_footing_restick( "tf_movement_lost_footing_restick", "50
 ConVar tf_movement_lost_footing_friction( "tf_movement_lost_footing_friction", "0.1", FCVAR_REPLICATED | FCVAR_CHEAT,
                                           "Ground friction for players who have lost their footing" );
 
+///
+//Sine Fortress Convars
+//
+
+// Sine Fortress goo 
+ConVar sf_goojump_speed("sf_goojump_speed", "1.8", FCVAR_REPLICATED, "The speed boost multiplier from jumping in a jump goo puddle");
+ConVar sf_goojump_multi("sf_goojump_multi", "1.8", FCVAR_REPLICATED, "The jump height multiplier to add to a jump in the jump goo");
+ConVar sf_goo_falldamage_forgiveness("sf_goo_falldamage_forgiveness", "1", FCVAR_NOTIFY | FCVAR_REPLICATED, "Prevent fall damage after goo jumping/flinging");
+
 extern ConVar cl_forwardspeed;
 extern ConVar cl_backspeed;
 extern ConVar cl_sidespeed;
@@ -1312,6 +1321,18 @@ bool CTFGameMovement::CheckJumpButton()
 	
 #endif // STAGING_ONLY
 */
+	if (m_pTFPlayer->m_Shared.InCond(TF_COND_JUMP_GOO))
+	{
+#ifdef GAME_DLL
+		if (sf_goo_falldamage_forgiveness.GetBool())
+			m_pTFPlayer->DisableNextFallDamage();
+#endif
+		flJumpMod += sf_goojump_multi.GetFloat();
+		mv->m_vecVelocity[0] *= sf_goojump_speed.GetFloat();
+		mv->m_vecVelocity[1] *= sf_goojump_speed.GetFloat();
+		m_pTFPlayer->EmitSound("Weapon_GooGun.GooJump");
+	}
+
 	if ( m_pTFPlayer->m_Shared.GetCarryingRuneType() == RUNE_AGILITY )
 	{
 		flJumpMod *= 1.8f;
@@ -2580,6 +2601,11 @@ void CTFGameMovement::CheckFalling( void )
 	}
 
 	BaseClass::CheckFalling();
+
+#ifdef GAME_DLL
+	if (player->GetGroundEntity() != NULL && !IsDead())
+		m_pTFPlayer->EnableNextFallDamage();
+#endif
 }
 
 //-----------------------------------------------------------------------------

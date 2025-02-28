@@ -290,6 +290,7 @@ ETFCond g_aDebuffConditions[] =
 	TF_COND_BLEEDING,
 	TF_COND_MAD_MILK,
 	TF_COND_GAS,
+	TF_COND_ACID_BURN,
 	TF_COND_LAST
 };
 
@@ -299,7 +300,8 @@ bool ConditionExpiresFast( ETFCond eCond )
 		|| eCond == TF_COND_URINE
 		|| eCond == TF_COND_BLEEDING
 		|| eCond == TF_COND_MAD_MILK
-		|| eCond == TF_COND_GAS;
+		|| eCond == TF_COND_GAS
+		|| eCond == TF_COND_ACID_BURN;
 }
 
 static const char *g_aConditionNames[] =
@@ -435,6 +437,8 @@ static const char *g_aConditionNames[] =
 	"TF_COND_HALLOWEEN_HELL_HEAL",              // = 128
 	"TF_COND_POWERUPMODE_DOMINANT",             // = 129
 	"TF_COND_IMMUNE_TO_PUSHBACK",				// = 130
+	"TF_COND_ACID_BURN",						// = 131
+	"TF_COND_JUMP_GOO",							// = 132
 
 	//
 	// ADD NEW ITEMS HERE TO AVOID BREAKING DEMOS
@@ -718,6 +722,8 @@ const char *g_aWeaponNames[] =
 	"TF_WEAPON_JAR_GAS",
 	"TF_WEAPON_GRENADE_JAR_GAS",
 	"TF_WEPON_FLAME_BALL",
+	"TF_WEAPON_GOOGUN",
+	"TF_WEAPON_RAYGUN_SCIENTIST",
 
 };
 COMPILE_TIME_ASSERT( ARRAYSIZE( g_aWeaponNames ) == TF_WEAPON_COUNT );
@@ -925,6 +931,9 @@ const char *g_szSpecialDamageNames[] =
 	"TF_DMG_CUSTOM_AXTINGUISHER_BOOSTED",
 	"TF_DMG_CUSTOM_KRAMPUS_MELEE",
 	"TF_DMG_CUSTOM_KRAMPUS_RANGED",
+	//Sine Fortress Custom Damage
+	"TF_DMG_CUSTOM_ACID_BURN",
+
 };
 COMPILE_TIME_ASSERT( ARRAYSIZE( g_szSpecialDamageNames ) == TF_DMG_CUSTOM_END );
 
@@ -982,6 +991,8 @@ const char *g_szProjectileNames[] =
 	"projectile_bread_monster",
 	"projectile_jar_gas",
 	"tf_projectile_balloffire",
+	"projectile_goo",
+	"projectile_energy_laser",
 
 };
 COMPILE_TIME_ASSERT( ARRAYSIZE( g_szProjectileNames ) == TF_NUM_PROJECTILES );
@@ -1020,6 +1031,8 @@ int g_iProjectileWeapons[] =
 	TF_WEAPON_THROWABLE,
 	TF_WEAPON_JAR_GAS,
 	TF_WEAPON_FLAME_BALL,
+	TF_WEAPON_GOOGUN,
+	TF_WEAPON_RAYGUN_SCIENTIST,
 
 };
 

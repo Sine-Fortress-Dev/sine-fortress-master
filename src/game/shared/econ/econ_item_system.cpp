@@ -531,7 +531,8 @@ public:
 #if ( defined( GAME_DLL ) || defined( CLIENT_DLL ) ) && ( defined( _DEBUG ) || defined( STAGING_ONLY ) )
 		const bool bUseGCCopy = items_game_use_gc_copy.GetBool();
 #else
-		const bool bUseGCCopy = true;
+		// Sine Fortress uses it's own custom items_game file
+		const bool bUseGCCopy = false;
 #endif
 
 		if ( bUseGCCopy == false && k_EUniversePublic != GetUniverse() )

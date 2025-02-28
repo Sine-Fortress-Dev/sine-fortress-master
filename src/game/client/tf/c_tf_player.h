@@ -719,6 +719,12 @@ public:
 	HPARTICLEFFECT      m_pBurningEffect;
 	float				m_flBurnEffectStartTime;
 
+	// Acid Burn
+	CSoundPatch*		m_pAcidBurnSound;
+	HPARTICLEFFECT		m_pAcidBurnEffect;
+	float				m_flAcidBurnEffectStartTime;
+	float				m_flAcidBurnEffectEndTime;
+
 	// Urine
 	HPARTICLEFFECT		m_pUrineEffect;
 

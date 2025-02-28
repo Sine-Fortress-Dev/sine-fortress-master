@@ -183,6 +183,10 @@ ConVar tf_allow_taunt_switch( "tf_allow_taunt_switch", "0", FCVAR_REPLICATED, "0
 
 ConVar tf_allow_all_team_partner_taunt( "tf_allow_all_team_partner_taunt", "1", FCVAR_REPLICATED | FCVAR_DEVELOPMENTONLY );
 
+//Sine Fortress
+ConVar sf_goo_scientist_resistance("sf_goo_scientist_resistance", "1", FCVAR_REPLICATED | FCVAR_CHEAT, "If the resistance to goo should apply to scientists, default = 1");
+ConVar sf_goo_scientist_resistance_percentage("sf_goo_scientist_resistance_percentage", "50.0", FCVAR_REPLICATED | FCVAR_CHEAT, "Percent damage resistance to goo as Scientist");
+
 // AFTERBURN
 const float tf_afterburn_max_duration = 10.f;
 const float tf_afterburn_duration_ratio_second_degree = 0.4f;
@@ -919,6 +923,7 @@ void CTFPlayerShared::Init( CTFPlayer *pPlayer )
 	m_pOuter = pPlayer;
 
 	m_flNextBurningSound = 0;
+	m_flNextAcidBurnSound = 0;
 
 	m_bArenaFirstBloodBoost = false;
 	m_iStunAnimState = STUN_ANIM_NONE;
@@ -1282,6 +1287,7 @@ CBaseEntity *CTFPlayerShared::GetConditionAssistFromVictim( void )
 		TF_COND_MAD_MILK,
 		TF_COND_MARKEDFORDEATH,
 		TF_COND_GAS,
+		TF_COND_ACID_BURN,
 	};
 
 	CBaseEntity *pProvider = NULL;
@@ -1854,6 +1860,14 @@ void CTFPlayerShared::OnConditionAdded( ETFCond eCond )
 		OnAddHalloweenHellHeal();
 		break;
 
+		//Sine Fortresss Conds
+	case TF_COND_ACID_BURN:
+		OnAddAcidBurn();
+		break;
+
+	case TF_COND_JUMP_GOO:
+		OnAddJumpGoo();
+		break;
 
 	default:
 		break;
@@ -2198,6 +2212,12 @@ void CTFPlayerShared::OnConditionRemoved( ETFCond eCond )
 		OnRemoveHalloweenHellHeal();
 		break;
 
+	//Sine Fortress
+	case TF_COND_ACID_BURN:
+		OnRemoveAcidBurn();
+
+	case TF_COND_JUMP_GOO:
+		OnRemoveJumpGoo();
 
 	default:
 		break;
@@ -3059,6 +3079,48 @@ void CTFPlayerShared::ConditionGameRulesThink( void )
 		RadiusHealthkitCollectionCheck();
 	}
 
+	//SF conds defined here:
+
+	if (InCond(TF_COND_ACID_BURN))
+	{
+		// If we're underwater, put the fire out
+		if (gpGlobals->curtime > m_flAcidRemoveTime || m_pOuter->GetWaterLevel() >= WL_Waist)
+		{
+			RemoveCond(TF_COND_ACID_BURN);
+			//m_iAcidLevel = 0;
+		}
+		else if (gpGlobals->curtime >= m_flAcidBurnTime)
+		{
+			//Coder: Might need to remake this later
+			//CALL_ATTRIB_HOOK_FLOAT_ON_OTHER(m_hBurnWeapon, flBurnDamage, mult_wpn_burndmg);
+
+			CTakeDamageInfo info(m_hAcidAttacker, m_hAcidAttacker, m_hAcidWeapon, m_flAcidDamage, DMG_BURN | DMG_PREVENT_PHYSICS_FORCE, TF_DMG_CUSTOM_ACID_BURN);
+
+			if (m_pOuter->IsPlayerClass(TF_CLASS_SCIENTIST) && sf_goo_scientist_resistance.GetBool()) //if Sci has damage resistance on AND goo from other team
+			{
+				float flDamage = m_flAcidDamage;
+				flDamage *= ((100.0 - sf_goo_scientist_resistance_percentage.GetFloat()) / 100.0);
+				info.SetDamage(flDamage);
+			}
+
+			if (m_bAcidCritical)
+			{
+				info.SetCritType(CTakeDamageInfo::CRIT_MINI);
+				m_bAcidCritical = false;
+			}
+
+			m_pOuter->TakeDamage(info);
+
+			m_flAcidBurnTime = gpGlobals->curtime + TF_ACID_BURN_FREQUENCY;
+		}
+
+		if (m_flNextAcidBurnSound < gpGlobals->curtime)
+		{
+			m_pOuter->SpeakConceptIfAllowed(MP_CONCEPT_ONFIRE);
+			m_flNextAcidBurnSound = gpGlobals->curtime + 2.5;
+		}
+	}
+
 #endif // GAME_DLL
 }
 
@@ -3472,6 +3534,11 @@ void CTFPlayerShared::OnAddInvulnerable( void )
 	if ( InCond( TF_COND_PLAGUE ) )
 	{
 		RemoveCond( TF_COND_PLAGUE );
+	}
+
+	if (InCond(TF_COND_ACID_BURN))
+	{
+		RemoveCond(TF_COND_ACID_BURN);
 	}
 #endif
 }
@@ -6833,6 +6900,43 @@ void CTFPlayerShared::StopBleed( CTFPlayer *pPlayer, CTFWeaponBase *pWeapon )
 }
 #endif // GAME_DLL
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CTFPlayerShared::AcidBurn(CTFPlayer* pAttacker, float damage, bool critical /* = false */)
+{
+#ifndef CLIENT_DLL
+	// Don't bother acid burning players who have just been killed by the acid damage.
+	if (!m_pOuter->IsAlive())
+		return;
+
+	// scientists don't take acid damage and don't add inferior acid damage
+	//if (TF_CLASS_SCIENTIST == m_pOuter->GetPlayerClass()->GetClassIndex() || nAcidLevel < m_iAcidLevel)
+		//return;
+
+	bool bNewAcid = false;
+
+	// Don't set next acid damage to be asap if player already had acid damage 
+	if (!InCond(TF_COND_ACID_BURN))
+		bNewAcid = true;
+
+	if (damage > m_flAcidDamage) m_flAcidDamage = damage; //prevent goo overlap damage
+
+
+	AddCond(TF_COND_ACID_BURN);
+
+	if (bNewAcid)
+		m_flAcidBurnTime = gpGlobals->curtime;	//asap
+
+	if (critical)
+		m_bAcidCritical = true;
+
+	m_flAcidRemoveTime = gpGlobals->curtime + TF_ACID_BURN_ACID_LIFE;
+	m_hAcidAttacker = pAttacker;
+	//m_hAcidWeapon = pWeapon;
+
+#endif
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -6884,6 +6988,40 @@ void CTFPlayerShared::OnRemoveBurning( void )
 		RemoveCond( TF_COND_HEALING_DEBUFF );
 	}
 #endif
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CTFPlayerShared::OnRemoveAcidBurn(void)
+{
+#ifdef CLIENT_DLL
+	m_pOuter->StopBurningSound();
+
+	if (m_pOuter->m_pAcidBurnEffect)
+	{
+		m_pOuter->ParticleProp()->StopEmission(m_pOuter->m_pAcidBurnEffect);
+		m_pOuter->m_pAcidBurnEffect = NULL;
+	}
+
+	if (m_pOuter->IsLocalPlayer())
+	{
+		view->SetScreenOverlayMaterial(NULL);
+	}
+
+	m_pOuter->m_flAcidBurnEffectStartTime = 0;
+	m_pOuter->m_flAcidBurnEffectEndTime = 0;
+#else
+	m_hAcidAttacker = NULL;
+	m_hAcidWeapon = NULL;
+	m_iAcidLevel = 0;
+	m_flAcidDamage = 0;
+#endif
+}
+
+void CTFPlayerShared::OnRemoveJumpGoo(void)
+{
+	//There is nothing here yet, too bad
 }
 
 //-----------------------------------------------------------------------------
@@ -7278,6 +7416,54 @@ void CTFPlayerShared::OnAddBurning( void )
 
 	// play a fire-starting sound
 	m_pOuter->EmitSound( "Fire.Engulf" );
+}
+
+void CTFPlayerShared::OnAddAcidBurn(void)
+{
+#ifdef CLIENT_DLL
+	// Start the burning effect
+	if (!m_pOuter->m_pAcidBurnEffect)
+	{
+		const char* pszEffectName = "spellbook_minor_fire";
+
+		m_pOuter->m_pAcidBurnEffect = m_pOuter->ParticleProp()->Create(pszEffectName, PATTACH_POINT_FOLLOW, "head");
+
+		m_pOuter->m_flAcidBurnEffectStartTime = gpGlobals->curtime;
+		m_pOuter->m_flAcidBurnEffectEndTime = gpGlobals->curtime + TF_BURNING_FLAME_LIFE;
+	}
+	// set the burning screen overlay
+	if (m_pOuter->IsLocalPlayer())
+	{
+		IMaterial* pMaterial = materials->FindMaterial(TF_SCREEN_OVERLAY_MATERIAL_BURNING, TEXTURE_GROUP_CLIENT_EFFECTS, false);
+		if (!IsErrorMaterial(pMaterial))
+		{
+			view->SetScreenOverlayMaterial(pMaterial);
+		}
+	}
+#endif
+
+	/*
+	#ifdef GAME_DLL
+
+	if ( player == robin || player == cook )
+	{
+	CSingleUserRecipientFilter filter( m_pOuter );
+	TFGameRules()->SendHudNotification( filter, HUD_NOTIFY_SPECIAL );
+	}
+
+	#endif
+	*/
+
+#ifdef CLIENT_DLL
+	// play a fire-starting sound
+	if (m_pOuter->m_flAcidBurnEffectEndTime < gpGlobals->curtime)
+		m_pOuter->EmitSound("Fire.Engulf");
+#endif
+}
+
+void CTFPlayerShared::OnAddJumpGoo(void)
+{
+	//There is nothing here yet, too bad
 }
 
 //-----------------------------------------------------------------------------

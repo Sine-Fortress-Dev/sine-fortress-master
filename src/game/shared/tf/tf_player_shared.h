@@ -446,6 +446,8 @@ public:
 	void	StopBleed( CTFPlayer *pPlayer, CTFWeaponBase *pWeapon );
 #endif // GAME_DLL
 
+	void AcidBurn(CTFPlayer* pAttacker, float damage, bool critical);
+
 	// Weapons.
 	CTFWeaponBase *GetActiveTFWeapon() const;
 
@@ -819,6 +821,8 @@ private:
 	void OnAddCompetitiveLoser( void );
 	void OnAddCondGas( void );
 	void OnAddRocketPack( void );
+	void OnAddAcidBurn(void);
+	void OnAddJumpGoo(void);
 
 
 	void OnRemoveZoomed( void );
@@ -899,6 +903,8 @@ private:
 	void OnRemoveCondGas( void );
 	void OnRemoveRocketPack( void );
 	void OnRemoveBurningPyro( void );
+	void OnRemoveAcidBurn(void);
+	void OnRemoveJumpGoo(void);
 	
 
 	// Starting a new trend, putting Add and Remove next to each other
@@ -1037,6 +1043,15 @@ private:
 	float					m_flFlameBurnTime;
 	float					m_flAfterburnDuration;
 
+	// Acid handling
+	CHandle<CTFPlayer>		m_hAcidAttacker;
+	CHandle<CTFWeaponBase>	m_hAcidWeapon;
+	float					m_flAcidDamage;
+	float					m_flAcidBurnTime;
+	float					m_flAcidRemoveTime;
+	int						m_iAcidLevel;
+	bool					m_bAcidCritical;
+
 	// Bleeding
 	struct bleed_struct_t
 	{
@@ -1089,6 +1104,7 @@ private:
 	CNetworkVar( int, m_iDesiredPlayerClass );
 
 	float m_flNextBurningSound;
+	float m_flNextAcidBurnSound;
 
 	CNetworkVar( float, m_flCloakMeter );	// [0,100]
 

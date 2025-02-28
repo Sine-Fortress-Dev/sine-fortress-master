@@ -16,6 +16,7 @@
 #ifdef CLIENT_DLL
 #define CTFRaygun C_TFRaygun
 #define CTFDRGPomson C_TFDRGPomson
+#define CTFRaygun_Scientist C_TFRaygun_Scientist
 #endif
 
 class CTFRaygun : public CTFRocketLauncher
@@ -100,5 +101,26 @@ public:
 };
 
 
+//---------------------------------------------------------
+class CTFRaygun_Scientist : public CTFRaygun
+{
+public:
+	DECLARE_CLASS(CTFRaygun_Scientist, CTFRaygun);
+	DECLARE_NETWORKCLASS();
+	DECLARE_PREDICTABLE();
+
+	virtual void		Precache();
+	virtual void		PrimaryAttack(void);
+
+	virtual int			GetWeaponID(void) const { return TF_WEAPON_RAYGUN_SCIENTIST; }
+	const char* GetEffectLabelText(void) { return "#TF_Raygun_Sci_HUD"; }
+
+	virtual const char* GetMuzzleFlashParticleEffect(void) { return "raygun_sci_muzzleflash"; }
+	virtual const char* GetIdleParticleEffect(void) { return "raygun_sci_idle"; }
+
+	virtual bool		IsEnergyWeapon(void) const { return false; }
+
+	virtual void GetProjectileFireSetup(CTFPlayer* pPlayer, Vector vecOffset, Vector* vecSrc, QAngle* angForward, bool bHitTeammates = true, float flEndDist = 2000.f);
+};
 
 #endif // TF_WEAPON_RAYGUN_H

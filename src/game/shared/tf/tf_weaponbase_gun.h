@@ -76,6 +76,8 @@ public:
 	virtual CBaseEntity *FireJar( CTFPlayer *pPlayer );
 	virtual CBaseEntity *FireFlameRocket( CTFPlayer *pPlayer );
 	virtual CBaseEntity *FireEnergyBall( CTFPlayer *pPlayer, bool bRing=false );
+	virtual CBaseEntity* FireGoo(CTFPlayer* pPlayer);
+	virtual CBaseEntity* FireLaser(CTFPlayer* pPlayer);
 
 	virtual bool HasLastShotCritical( void );
 

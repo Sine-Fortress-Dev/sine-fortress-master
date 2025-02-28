@@ -516,6 +516,8 @@ enum ETFWeaponType
 	TF_WEAPON_JAR_GAS,
 	TF_WEAPON_GRENADE_JAR_GAS,
 	TF_WEAPON_FLAME_BALL,
+	TF_WEAPON_GOOGUN,
+	TF_WEAPON_RAYGUN_SCIENTIST,
 
 
 	//
@@ -577,7 +579,9 @@ enum ProjectileType_t
 	TF_PROJECTILE_SENTRY_ROCKET,
 	TF_PROJECTILE_BREAD_MONSTER,
 	TF_PROJECTILE_JAR_GAS,
-	TF_PROJECTILE_FLAME_BALL,	
+	TF_PROJECTILE_FLAME_BALL,
+	TF_PROJECTILE_GOO,
+	TF_PROJECTILE_ENERGY_LASER,
 
 	// Add new entries here!
 
@@ -617,6 +621,17 @@ enum arrow_models
 };
 
 extern const char *g_pszArrowModels[];
+
+//-----------------------------------------------------------------------------
+// Goo Types
+//-----------------------------------------------------------------------------
+enum
+{
+	TF_GOO_TOXIC = 0,
+	TF_GOO_JUMP,
+
+	TF_GOO_COUNT
+};
 
 //-----------------------------------------------------------------------------
 // Dead Calling Cards
@@ -682,6 +697,14 @@ extern const char *g_pszItemClassImagesBlue[];
 #define TF_SCOUT_NUMBEROFPHASEATTACHMENTS	5
 
 #define SHOW_DISGUISE_EFFECT 1
+
+// Acid burning
+#define TF_ACID_BURN_FREQUENCY 0.5f
+#define TF_ACID_BURN_ACID_LIFE 1.0f
+#define TF_ACID_BURN_LVL1_DMG 3
+#define TF_ACID_BURN_LVL2_DMG 6
+#define TF_ACID_BURN_LVL3_DMG 12
+#define TF_ACID_BURN_LVL4_DMG 24
 
 //
 // ADD NEW WEAPONS HERE TO AVOID BREAKING DEMOS
@@ -827,6 +850,9 @@ enum ETFCond
 		//
 	// ADD NEW ITEMS HERE TO AVOID BREAKING DEMOS
 	//
+	TF_COND_ACID_BURN						 = 131,
+	TF_COND_JUMP_GOO						 = 132,
+
 
 	// ******** Keep this block last! ********
 	// Keep experimental conditions below and graduate out of it before shipping
@@ -1268,6 +1294,9 @@ enum ETFDmgCustom
 	//
 	// INSERT NEW ITEMS HERE TO AVOID BREAKING DEMOS
 	//
+
+	//Sine Fortress Custom Damage
+	TF_DMG_CUSTOM_ACID_BURN,
 
 	TF_DMG_CUSTOM_END // END
 };

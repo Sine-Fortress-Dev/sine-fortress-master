@@ -51,6 +51,18 @@ END_PREDICTION_DATA()
 LINK_ENTITY_TO_CLASS( tf_weapon_drg_pomson, CTFDRGPomson );
 PRECACHE_WEAPON_REGISTER( tf_weapon_drg_pomson );
 
+//============================
+IMPLEMENT_NETWORKCLASS_ALIASED(TFRaygun_Scientist, DT_WeaponRaygun_Scientist)
+
+BEGIN_NETWORK_TABLE(CTFRaygun_Scientist, DT_WeaponRaygun_Scientist)
+END_NETWORK_TABLE()
+
+BEGIN_PREDICTION_DATA(CTFRaygun_Scientist)
+END_PREDICTION_DATA()
+
+LINK_ENTITY_TO_CLASS(tf_weapon_raygun_scientist, CTFRaygun_Scientist);
+PRECACHE_WEAPON_REGISTER(tf_weapon_raygun_scientist);
+
 
 //-----------------------------------------------------------------------------
 // Purpose:
@@ -252,4 +264,29 @@ void CTFDRGPomson::GetProjectileFireSetup( CTFPlayer *pPlayer, Vector vecOffset,
 
 	// adjust to line up with the weapon muzzle
 	vecSrc->z -= 13.0f;
+}
+
+void CTFRaygun_Scientist::Precache()
+{
+	BaseClass::Precache();
+
+	//PrecacheParticleSystem("SOMETHING? TODO");
+}
+
+void CTFRaygun_Scientist::PrimaryAttack(void)
+{
+	//We don't use energy, skip the energy check in the raygun primary fire
+	return BaseClass::BaseClass::PrimaryAttack();
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CTFRaygun_Scientist::GetProjectileFireSetup(CTFPlayer* pPlayer, Vector vecOffset, Vector* vecSrc, QAngle* angForward, bool bHitTeammates, float flEndDist)
+{
+	BaseClass::GetProjectileFireSetup(pPlayer, vecOffset, vecSrc, angForward, bHitTeammates, flEndDist);
+
+	// adjust to line up with the weapon muzzle
+	// we might need this later?
+	//vecSrc->z -= 13.0f;
 }

@@ -1057,6 +1057,10 @@ public:
 	// Talk control
 	virtual bool		CanPlayerTalk() OVERRIDE;
 
+	// Sine Fortress
+	void				DisableNextFallDamage(void) { m_bDisableNextFallDamage = true; }
+	void				EnableNextFallDamage(void) { m_bDisableNextFallDamage = false; }
+
 protected:
 
 	// Creation/Destruction.
@@ -1227,6 +1231,10 @@ private:
 	bool				m_bForceItemRemovalOnRespawn;
 
 	int					m_nPrevRoundTeamNum;
+
+	// Sine Fortress
+
+	bool				m_bDisableNextFallDamage;
 
 public:
 	bool				IsGoingFeignDeath( void ) { return m_bGoingFeignDeath; }
