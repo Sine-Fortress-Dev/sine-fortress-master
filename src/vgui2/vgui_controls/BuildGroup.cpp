@@ -916,7 +916,7 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 			bSuccess = rDat->LoadFromFile( g_pFullFileSystem, controlResourceName, "SKIN" );
 		}
 
-		if ( !V_stricmp( CommandLine()->ParmValue( "-game", "hl2" ), "tf" ) )
+		if ( !V_stricmp( CommandLine()->ParmValue( "-game", "hl2" ), "sine_fortress" ) )
 		{
 			if ( !bSuccess )
 			{

@@ -3270,7 +3270,7 @@ void SixenseInput::SixenseUpdateMouseCursor()
 	if( window_name[0] == '\0' )
 	{
 		const char *pGameDir = COM_GetModDirectory();
-		if ( FStrEq( pGameDir, "tf_beta" ) )
+		if ( FStrEq( pGameDir, "sine_fortress" ) )
 		{
 			Q_strncpy( window_name, "Team Fortress 2 Beta", str_len );
 		}

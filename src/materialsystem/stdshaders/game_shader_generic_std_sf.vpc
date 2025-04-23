@@ -6,12 +6,12 @@
 
 $Macro SRCDIR       "..\.."
 $Macro OUTBINNAME   "game_shader_generic_std"
-$Macro GAMENAME     "mod_tf"
+$Macro GAMENAME     "sine_fortress"
 
 $Macro OUTBINDIR	"$SRCDIR\..\game\$GAMENAME\bin"
 
 $Include "$SRCDIR\materialsystem\stdshaders\stdshader_dx9_inc.vpc"
 
-$Project "Standard Shader Replacements (TF)"
+$Project "Standard Shader Replacements (SF)"
 {
 }
