@@ -7709,22 +7709,29 @@ int C_TFPlayer::GetSkin()
 		iVisibleTeam = m_Shared.GetDisguiseTeam();
 	}
 
+	bool bHasCustomColor = (iVisibleTeam == TF_TEAM_BLUE && TFGameRules()->GetBlueTeamHasCustomColor()) ||
+							(iVisibleTeam == TF_TEAM_RED && TFGameRules()->GetRedTeamHasCustomColor());
+
 	int nSkin;
-
-	switch( iVisibleTeam )
+	if (!bHasCustomColor)
 	{
-	case TF_TEAM_RED:
-		nSkin = 0;
-		break;
+		switch (iVisibleTeam)
+		{
+		case TF_TEAM_RED:
+			nSkin = 0;
+			break;
 
-	case TF_TEAM_BLUE:
-		nSkin = 1;
-		break;
+		case TF_TEAM_BLUE:
+			nSkin = 1;
+			break;
 
-	default:
-		nSkin = 0;
-		break;
+		default:
+			nSkin = 0;
+			break;
+		}
 	}
+	else
+		nSkin = 2;
 
 	// Assume we'll switch skins to show the spy mask
 	bool bCheckSpyMask = true;
@@ -7733,7 +7740,7 @@ int C_TFPlayer::GetSkin()
 	if ( m_Shared.IsInvulnerable() && 
 		 ( !m_Shared.InCond( TF_COND_INVULNERABLE_HIDE_UNLESS_DAMAGED ) || gpGlobals->curtime < GetLastDamageTimeMvMOnly() + 2.0f ) )
 	{
-		nSkin += 2;
+		nSkin += 3;
 		bCheckSpyMask = false;
 	}
 
@@ -7755,11 +7762,11 @@ int C_TFPlayer::GetSkin()
 	{
 		if ( !IsEnemyPlayer() )
 		{
-			nSkin += 4 + ( ( m_Shared.GetDisguiseClass() - TF_FIRST_NORMAL_CLASS ) * 2 );
+			nSkin += 6 + ( ( m_Shared.GetDisguiseClass() - TF_FIRST_NORMAL_CLASS ) * 3 );
 		}
 		else if ( m_Shared.GetDisguiseClass() == TF_CLASS_SPY )
 		{
-			nSkin += 4 + ( ( m_Shared.GetDisguiseMask() - TF_FIRST_NORMAL_CLASS ) * 2 );
+			nSkin += 6 + ( ( m_Shared.GetDisguiseMask() - TF_FIRST_NORMAL_CLASS ) * 3 );
 		}
 	}
 
