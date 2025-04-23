@@ -712,11 +712,17 @@ void C_TFRagdoll::CreateTFRagdoll()
 
 		if ( m_iTeam == TF_TEAM_RED )
 		{
-			m_nSkin = 0;
+			if (TFGameRules()->GetRedTeamHasCustomColor())
+				m_nSkin = 2;
+			else
+				m_nSkin = 0;
 		}
 		else
 		{
-			m_nSkin = 1;
+			if (TFGameRules()->GetBlueTeamHasCustomColor())
+				m_nSkin = 2;
+			else
+				m_nSkin = 1;
 		}
 	}
 
