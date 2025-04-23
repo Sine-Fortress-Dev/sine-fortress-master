@@ -110,7 +110,7 @@ extern ISoundEmitterSystemBase *soundemitterbase;
 static Color colorEyeballBossText( 134, 80, 172, 255 );
 static Color colorMerasmusText( 112, 176, 74, 255 );
 
-ConVar default_fov( "default_fov", "75", FCVAR_CHEAT );
+ConVar default_fov( "default_fov", "90", FCVAR_CHEAT );
 ConVar fov_desired( "fov_desired", "75", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets the base field-of-view.", true, 20.0, true, MAX_FOV );
 
 
