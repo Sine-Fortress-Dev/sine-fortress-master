@@ -952,6 +952,8 @@ static const char *pszClassIcons[] = {
 	"../hud/leaderboard_class_pyro",
 	"../hud/leaderboard_class_spy",
 	"../hud/leaderboard_class_engineer",
+	"../hud/leaderboard_class_scientist",
+	"../hud/leaderboard_class_rusher",
 };
 
 template <>

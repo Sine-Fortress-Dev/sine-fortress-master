@@ -840,6 +840,8 @@ bool CTFBot::GetWeightDesiredClassToSpawn( CUtlVector< ETFClass > &vecClassToSpa
 		{ TF_CLASS_MEDIC,			4, 4, 1, { 1, 1, 2, 2 } },
 		{ TF_CLASS_SNIPER,			5, 0, 0, { 0, 1, 1, 1 } },
 		{ TF_CLASS_SPY,				5, 0, 0, { 0, 1, 2, 2 } },
+		{ TF_CLASS_SCIENTIST,		4, 0, 0, { 2, 2, 2, 2 } },
+		{ TF_CLASS_RUSHER,			0, 0, 0, { NoLimit, NoLimit, NoLimit, NoLimit } },
 
 		{ TF_CLASS_UNDEFINED,		0, -1 },
 	};
@@ -855,6 +857,8 @@ bool CTFBot::GetWeightDesiredClassToSpawn( CUtlVector< ETFClass > &vecClassToSpa
 		{ TF_CLASS_SNIPER,			5, 0, 0, { 0, 1, 1, 1 } },
 		{ TF_CLASS_SPY,				5, 0, 0, { 0, 1, 2, 2 } },
 		{ TF_CLASS_ENGINEER,		5, 0, 0, { 1, 1, 1, 1 } },
+		{ TF_CLASS_SCIENTIST,		4, 0, 0, {NoLimit, NoLimit, NoLimit, NoLimit } },
+		{ TF_CLASS_RUSHER,			0, 0, 0, { NoLimit, NoLimit, NoLimit, NoLimit } },
 
 		{ TF_CLASS_UNDEFINED,		0, -1 },
 	};
@@ -870,6 +874,8 @@ bool CTFBot::GetWeightDesiredClassToSpawn( CUtlVector< ETFClass > &vecClassToSpa
 		{ TF_CLASS_SNIPER,			0, -1 },
 		{ TF_CLASS_SPY,				0, -1 },
 		{ TF_CLASS_ENGINEER,		0, -1 },
+		{ TF_CLASS_SCIENTIST,		0, 0, 0, { 0, 0, 1, 1 } },
+		{ TF_CLASS_RUSHER,			0, 0, 0, { 0, 0, NoLimit, NoLimit } },
 
 		{ TF_CLASS_UNDEFINED,		0, -1 },
 	};
@@ -3081,6 +3087,7 @@ float CTFBot::GetThreatDanger( CBaseCombatCharacter *who ) const
 		case TF_CLASS_MEDIC:
 			return 0.2f;		// 1/5
 
+		case TF_CLASS_SCIENTIST:
 		case TF_CLASS_ENGINEER:
 		case TF_CLASS_SNIPER:
 			return 0.4f;		// 2/5
@@ -3090,6 +3097,7 @@ float CTFBot::GetThreatDanger( CBaseCombatCharacter *who ) const
 		case TF_CLASS_DEMOMAN:
 			return 0.6f;		// 3/5
 
+		case TF_CLASS_RUSHER:
 		case TF_CLASS_SOLDIER:
 		case TF_CLASS_HEAVYWEAPONS:
 			return 0.8f;		// 4/5

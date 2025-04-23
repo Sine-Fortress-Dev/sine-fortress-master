@@ -22,7 +22,9 @@ const char *g_pszInactiveClassPortraits[] =
 	"class_sel_sm_engineer_inactive",	
 	"class_sel_sm_medic_inactive",	
 	"class_sel_sm_sniper_inactive",	
-	"class_sel_sm_spy_inactive",	
+	"class_sel_sm_spy_inactive",
+	"class_sel_sm_scientist_inactive",
+	"class_sel_sm_rusher_inactive",
 	"class_sel_sm_random_inactive",	 // Random
 };
 

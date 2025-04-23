@@ -785,6 +785,8 @@ ConVar tf_tournament_classlimit_heavy( "tf_tournament_classlimit_heavy", "-1", F
 ConVar tf_tournament_classlimit_pyro( "tf_tournament_classlimit_pyro", "-1", FCVAR_REPLICATED, "Tournament mode per-team class limit for Pyros.\n" );
 ConVar tf_tournament_classlimit_spy( "tf_tournament_classlimit_spy", "-1", FCVAR_REPLICATED, "Tournament mode per-team class limit for Spies.\n" );
 ConVar tf_tournament_classlimit_engineer( "tf_tournament_classlimit_engineer", "-1", FCVAR_REPLICATED, "Tournament mode per-team class limit for Engineers.\n" );
+ConVar tf_tournament_classlimit_scientist("tf_tournament_classlimit_scientist", "-1", FCVAR_REPLICATED, "Tournament mode per-team class limit for Scientists.\n");
+ConVar tf_tournament_classlimit_rusher("tf_tournament_classlimit_rusher", "-1", FCVAR_REPLICATED, "Tournament mode per-team class limit for Rushers.\n");
 ConVar tf_tournament_classchange_allowed( "tf_tournament_classchange_allowed", "1", FCVAR_REPLICATED, "Allow players to change class while the game is active?.\n" );
 ConVar tf_tournament_classchange_ready_allowed( "tf_tournament_classchange_ready_allowed", "1", FCVAR_REPLICATED, "Allow players to change class after they are READY?.\n" );
 
@@ -1283,7 +1285,7 @@ static CViewVectors g_TFViewVectors(
 	Vector( 0, 0, 14 )		//VEC_DEAD_VIEWHEIGHT (m_vDeadViewHeight) dead view height
 );							
 
-Vector g_TFClassViewVectors[11] =
+Vector g_TFClassViewVectors[TF_LAST_NORMAL_CLASS + 1] =
 {
 	Vector( 0, 0, 72 ),		// TF_CLASS_UNDEFINED
 
@@ -1296,6 +1298,8 @@ Vector g_TFClassViewVectors[11] =
 	Vector( 0, 0, 68 ),		// TF_CLASS_PYRO,
 	Vector( 0, 0, 75 ),		// TF_CLASS_SPY,
 	Vector( 0, 0, 68 ),		// TF_CLASS_ENGINEER,
+	Vector( 0, 0, 75 ),		// TF_CLASS_SCIENTIST,
+	Vector( 0, 0, 75 ),		// TF_CLASS_RUSHER,
 
 	Vector( 0, 0, 65 ),		// TF_CLASS_CIVILIAN,		// TF_LAST_NORMAL_CLASS
 };
@@ -11222,6 +11226,8 @@ static kill_eater_event_t g_eClassKillEvents[] =
 	kKillEaterEvent_PyroKill,					// TF_CLASS_PYRO
 	kKillEaterEvent_SpyKill,					// TF_CLASS_SPY
 	kKillEaterEvent_EngineerKill,				// TF_CLASS_ENGINEER
+	kKillEaterEvent_ScientistKill,				// TF_CLASS_SCIENTIST
+	kKillEaterEvent_RusherKill,					// TF_CLASS_RUSHER
 };
 COMPILE_TIME_ASSERT( ARRAYSIZE( g_eClassKillEvents ) == (TF_LAST_NORMAL_CLASS - TF_FIRST_NORMAL_CLASS) );
 
@@ -11237,6 +11243,8 @@ static kill_eater_event_t g_eRobotClassKillEvents[] =
 	kKillEaterEvent_RobotPyroKill,					// TF_CLASS_PYRO
 	kKillEaterEvent_RobotSpyKill,					// TF_CLASS_SPY
 	kKillEaterEvent_RobotEngineerKill,				// TF_CLASS_ENGINEER
+	kKillEaterEvent_RobotScientistKill,				// TF_CLASS_SCIENTIST
+	kKillEaterEvent_RobotRusherKill,				// TF_CLASS_RUSHER
 };
 COMPILE_TIME_ASSERT( ARRAYSIZE( g_eRobotClassKillEvents ) == (TF_LAST_NORMAL_CLASS - TF_FIRST_NORMAL_CLASS) );
 
@@ -17578,6 +17586,8 @@ int CTFGameRules::GetClassLimit( int iClass )
 		case TF_CLASS_PYRO: return tf_tournament_classlimit_pyro.GetInt(); break;
 		case TF_CLASS_SPY: return tf_tournament_classlimit_spy.GetInt(); break;
 		case TF_CLASS_ENGINEER: return tf_tournament_classlimit_engineer.GetInt(); break;
+		case TF_CLASS_SCIENTIST: return tf_tournament_classlimit_scientist.GetInt(); break;
+		case TF_CLASS_RUSHER: return tf_tournament_classlimit_rusher.GetInt(); break;
 		default:
 			break;
 		}
@@ -19290,6 +19300,8 @@ BEGIN_DATADESC( CTrainingModeLogic )
 	DEFINE_OUTPUT( m_outputOnPlayerSpawnAsPyro, "OnPlayerSpawnAsPyro" ),
 	DEFINE_OUTPUT( m_outputOnPlayerSpawnAsSpy, "OnPlayerSpawnAsSpy" ),
 	DEFINE_OUTPUT( m_outputOnPlayerSpawnAsEngineer, "OnPlayerSpawnAsEngineer" ),
+	DEFINE_OUTPUT( m_outputOnPlayerSpawnAsScientist, "OnPlayerSpawnAsScientist" ),
+	DEFINE_OUTPUT( m_outputOnPlayerSpawnAsRusher, "OnPlayerSpawnAsRusher" ),
 	DEFINE_OUTPUT( m_outputOnPlayerDied, "OnPlayerDied" ),
 	DEFINE_OUTPUT( m_outputOnBotDied, "OnBotDied" ),
 	DEFINE_OUTPUT( m_outputOnPlayerSwappedToWeaponSlotPrimary, "OnPlayerSwappedToPrimary" ),
@@ -19349,6 +19361,8 @@ void CTrainingModeLogic::OnPlayerSpawned( CTFPlayer* pPlayer )
 	case TF_CLASS_PYRO:			m_outputOnPlayerSpawnAsPyro.FireOutput( this, this ); break;
 	case TF_CLASS_SPY:			m_outputOnPlayerSpawnAsSpy.FireOutput( this, this ); break;
 	case TF_CLASS_ENGINEER:		m_outputOnPlayerSpawnAsEngineer.FireOutput( this, this ); break;
+	case TF_CLASS_SCIENTIST:	m_outputOnPlayerSpawnAsScientist.FireOutput(this, this); break;
+	case TF_CLASS_RUSHER:		m_outputOnPlayerSpawnAsRusher.FireOutput(this, this); break;
 	}
 }
 

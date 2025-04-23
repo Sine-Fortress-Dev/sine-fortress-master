@@ -37,6 +37,8 @@ PASSTIME_CONVAR( tf_passtime_steal_on_melee, 1, "Enables melee stealing." );
 PASSTIME_CONVAR( tf_passtime_teammate_steal_time, 45, "How many seconds a player can hold the ball before teammates can steal it." );
 PASSTIME_CONVAR( tf_passtime_throwarc_scout, 0.1f, "" );
 PASSTIME_CONVAR( tf_passtime_throwarc_soldier, 0.1f, "" );
+PASSTIME_CONVAR( tf_passtime_throwarc_scientist, 0.1f, "");
+PASSTIME_CONVAR( tf_passtime_throwarc_rusher, 0.1f, "");
 PASSTIME_CONVAR( tf_passtime_throwarc_pyro, 0.1f, "" );
 PASSTIME_CONVAR( tf_passtime_throwarc_demoman, 0.15f, "" );
 PASSTIME_CONVAR( tf_passtime_throwarc_heavy, 0.175f, "" );
@@ -53,6 +55,8 @@ PASSTIME_CONVAR( tf_passtime_throwspeed_engineer, 850.0f, "" );
 PASSTIME_CONVAR( tf_passtime_throwspeed_medic, 900.0f, "" );
 PASSTIME_CONVAR( tf_passtime_throwspeed_sniper, 900.0f, "" );
 PASSTIME_CONVAR( tf_passtime_throwspeed_spy, 900.0f, "" );
+PASSTIME_CONVAR(tf_passtime_throwspeed_scientist, 800.0f, "");
+PASSTIME_CONVAR(tf_passtime_throwspeed_rusher, 990.0f, "");
 PASSTIME_CONVAR( tf_passtime_throwspeed_velocity_scale, 0.33f, "How much player velocity to add when tossing (0=none 1=100%)" );
 PASSTIME_CONVAR( tf_passtime_save_stats, 0, "" );
 

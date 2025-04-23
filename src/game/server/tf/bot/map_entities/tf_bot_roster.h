@@ -25,6 +25,8 @@ public:
 	void InputSetAllowPyro( inputdata_t &inputdata );
 	void InputSetAllowSpy( inputdata_t &inputdata );
 	void InputSetAllowEngineer( inputdata_t &inputdata );
+	void InputSetAllowScientist(inputdata_t& inputdata);
+	void InputSetAllowRusher(inputdata_t& inputdata);
 
 	// misc.
 	bool IsClassAllowed( int iBotClass ) const;

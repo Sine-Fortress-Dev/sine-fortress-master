@@ -37,6 +37,8 @@ const char *g_sImagesBlue[] = {
 	"class_sel_sm_pyro_blu",
 	"class_sel_sm_spy_blu",
 	"class_sel_sm_engineer_blu",
+	"class_sel_sm_scientist_blu",
+	"class_sel_sm_rusher_blu"
 	"",
 };
 
@@ -51,6 +53,8 @@ const char *g_sImagesRed[] = {
 	"class_sel_sm_pyro_red",
 	"class_sel_sm_spy_red",
 	"class_sel_sm_engineer_red",
+	"class_sel_sm_scientist_red",
+	"class_sel_sm_rusher_red",
 	"",
 };
 

@@ -112,6 +112,8 @@ void CHudMenuSpyDisguise::ApplySchemeSettings( IScheme *pScheme )
 		m_pClassItems_Red[6]->LoadControlSettings( VarArgs( "%s/medic_red.res", res_dir ) );
 		m_pClassItems_Red[7]->LoadControlSettings( VarArgs( "%s/sniper_red.res", res_dir ) );
 		m_pClassItems_Red[8]->LoadControlSettings( VarArgs( "%s/spy_red.res", res_dir ) );
+		m_pClassItems_Red[8]->LoadControlSettings( VarArgs( "%s/scientist_red.res", res_dir ) );
+		m_pClassItems_Red[8]->LoadControlSettings( VarArgs( "%s/rusher_red.res", res_dir ) );
 
 		m_pClassItems_Blue[0]->LoadControlSettings( VarArgs( "%s/scout_blue.res", res_dir ) );
 		m_pClassItems_Blue[1]->LoadControlSettings( VarArgs( "%s/soldier_blue.res", res_dir ) );
@@ -122,6 +124,8 @@ void CHudMenuSpyDisguise::ApplySchemeSettings( IScheme *pScheme )
 		m_pClassItems_Blue[6]->LoadControlSettings( VarArgs( "%s/medic_blue.res", res_dir ) );
 		m_pClassItems_Blue[7]->LoadControlSettings( VarArgs( "%s/sniper_blue.res", res_dir ) );
 		m_pClassItems_Blue[8]->LoadControlSettings( VarArgs( "%s/spy_blue.res", res_dir ) );
+		m_pClassItems_Blue[8]->LoadControlSettings( VarArgs( "%s/scientist_blue.res", res_dir ) );
+		m_pClassItems_Blue[8]->LoadControlSettings( VarArgs( "%s/rusher_blue.res", res_dir ) );
 
 		m_pActiveSelection = dynamic_cast< EditablePanel * >( FindChildByName( "active_selection_bg" ) );
 
@@ -143,6 +147,8 @@ void CHudMenuSpyDisguise::ApplySchemeSettings( IScheme *pScheme )
 		m_pClassItems_Red[6]->LoadControlSettings( "resource/UI/disguise_menu/medic_red.res" );
 		m_pClassItems_Red[7]->LoadControlSettings( "resource/UI/disguise_menu/sniper_red.res" );
 		m_pClassItems_Red[8]->LoadControlSettings( "resource/UI/disguise_menu/spy_red.res" );
+		m_pClassItems_Red[8]->LoadControlSettings( "resource/UI/disguise_menu/scientist_red.res" );
+		m_pClassItems_Red[8]->LoadControlSettings( "resource/UI/disguise_menu/rusher_red.res" );
 
 		m_pClassItems_Blue[0]->LoadControlSettings( "resource/UI/disguise_menu/scout_blue.res" );
 		m_pClassItems_Blue[1]->LoadControlSettings( "resource/UI/disguise_menu/soldier_blue.res" );
@@ -153,6 +159,8 @@ void CHudMenuSpyDisguise::ApplySchemeSettings( IScheme *pScheme )
 		m_pClassItems_Blue[6]->LoadControlSettings( "resource/UI/disguise_menu/medic_blue.res" );
 		m_pClassItems_Blue[7]->LoadControlSettings( "resource/UI/disguise_menu/sniper_blue.res" );
 		m_pClassItems_Blue[8]->LoadControlSettings( "resource/UI/disguise_menu/spy_blue.res" );
+		m_pClassItems_Blue[8]->LoadControlSettings( "resource/UI/disguise_menu/scientist_blue.res" );
+		m_pClassItems_Blue[8]->LoadControlSettings( "resource/UI/disguise_menu/rusher_blue.res" );
 
 		m_pActiveSelection = NULL;
 	}

@@ -252,6 +252,18 @@ bool CTFBotVision::IsIgnored( CBaseEntity *subject ) const
 				return true;
 			}
 			break;
+		case TF_CLASS_SCIENTIST:
+			if (me->IsBehaviorFlagSet(TFBOT_IGNORE_ENEMY_SCIENTISTS))
+			{
+				return true;
+			}
+			break;
+		case TF_CLASS_RUSHER:
+			if (me->IsBehaviorFlagSet(TFBOT_IGNORE_ENEMY_RUSHERS))
+			{
+				return true;
+			}
+			break;
 		}
 
 

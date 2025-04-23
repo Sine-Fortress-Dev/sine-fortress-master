@@ -2056,6 +2056,8 @@ void CBackpackPanel::OpenContextMenu()
 					case TF_CLASS_PYRO: 			pszClassName = "#TF_Class_Name_Pyro"; break;
 					case TF_CLASS_SPY: 				pszClassName = "#TF_Class_Name_Spy"; break;
 					case TF_CLASS_ENGINEER: 		pszClassName = "#TF_Class_Name_Engineer"; break;
+					case TF_CLASS_SCIENTIST: 		pszClassName = "#TF_Class_Name_Scientist"; break;
+					case TF_CLASS_RUSHER: 			pszClassName = "#TF_Class_Name_Rusher"; break;
 				}
 			
 				pEquipSubMenu->AddMenuItem( pszClassName, new KeyValues( "Command", "command", CFmtStr( "equipclass%d", iClass ) ), this );

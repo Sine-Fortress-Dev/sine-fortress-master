@@ -206,7 +206,7 @@ bool CTFTeamStatusPlayerPanel::Update( void )
 					int iDeadClass = bFeigned ? g_TF_PR->GetPlayerClass( m_iPlayerIndex ) : g_TF_PR->GetPlayerClassWhenKilled( m_iPlayerIndex );
 					if ( !bAlive && !bSameTeamAsLocalPlayer && ( m_iTeam >= FIRST_GAME_TEAM ) && ( iDeadClass > TF_CLASS_UNDEFINED ) )
 					{
-						m_pClassImage->SetImage( VarArgs( "%s_alpha", ( m_iTeam == TF_TEAM_RED ) ? g_pszItemClassImagesRed[iDeadClass + 9] : g_pszItemClassImagesBlue[iDeadClass + 9] ) );
+						m_pClassImage->SetImage(VarArgs( "%s_alpha", ( m_iTeam == TF_TEAM_RED) ? g_pszItemClassImagesRed[iDeadClass + TF_LAST_NORMAL_CLASS - 1] : g_pszItemClassImagesBlue[iDeadClass + TF_LAST_NORMAL_CLASS - 1] ) );
 					}
 					else
 					{
@@ -221,7 +221,7 @@ bool CTFTeamStatusPlayerPanel::Update( void )
 					}
 					else
 					{
-						m_pClassImage->SetImage( VarArgs( "%s_alpha", ( m_iTeam == TF_TEAM_RED ) ? g_pszItemClassImagesRed[iClass + 9] : g_pszItemClassImagesBlue[iClass + 9] ) );
+						m_pClassImage->SetImage(VarArgs( "%s_alpha", ( m_iTeam == TF_TEAM_RED) ? g_pszItemClassImagesRed[iClass + TF_LAST_NORMAL_CLASS - 1] : g_pszItemClassImagesBlue[iClass + TF_LAST_NORMAL_CLASS - 1] ) );
 
 					}
 				}
