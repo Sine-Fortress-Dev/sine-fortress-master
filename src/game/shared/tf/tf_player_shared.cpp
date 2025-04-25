@@ -8785,23 +8785,23 @@ void CTFPlayerShared::ProcessDisguiseImpulse( CTFPlayer *pPlayer )
 	if ( !pPlayer )
 		return;
 
-	if ( pPlayer->GetImpulse() > 200 )
+	// @kiwano - use bit flags to handle disguising for >9 classes
+	int iImpulse = pPlayer->GetImpulse();
+	if ( iImpulse >= 7 << 5 )
 	{ 
-		char szImpulse[6];
-		Q_snprintf( szImpulse, sizeof( szImpulse ), "%d", pPlayer->GetImpulse() );
+		int iClass = iImpulse & 15;
+		
+		// too large
+		if(iClass > TF_CLASS_RUSHER) return;
 
-		char szTeam[3];
-		Q_snprintf( szTeam, sizeof( szTeam ), "%c", szImpulse[1] );
-
-		char szClass[3];
-		Q_snprintf( szClass, sizeof( szClass ), "%c", szImpulse[2] );
+		int iTeam = (iImpulse & 16) == 16 ? TF_TEAM_BLUE : TF_TEAM_RED;
 
 		// 'Your Eternal Reward' handling
 		bool bSwitchWeaponOnly = false;
 		if ( pPlayer->CanDisguise_OnKill() && pPlayer->m_Shared.InCond( TF_COND_DISGUISED ) )
 		{
 			// Only trying to change the disguise weapon via 'lastdisguise'
-			if ( Q_atoi( szClass ) == pPlayer->m_Shared.GetDisguiseClass() && Q_atoi( szTeam ) == pPlayer->m_Shared.GetDisguiseTeam() )
+			if ( iClass == pPlayer->m_Shared.GetDisguiseClass() && iTeam == pPlayer->m_Shared.GetDisguiseTeam() )
 			{
 				bSwitchWeaponOnly = true;
 			}
@@ -8811,7 +8811,7 @@ void CTFPlayerShared::ProcessDisguiseImpulse( CTFPlayer *pPlayer )
 		{
 			// intercepting the team value and reassigning what gets passed into Disguise()
 			// because the team numbers in the client menu don't match the #define values for the teams
-			pPlayer->m_Shared.Disguise( Q_atoi( szTeam ), Q_atoi( szClass ) );
+			pPlayer->m_Shared.Disguise( iTeam, iClass );
 
 			// Switch from the PDA to our previous weapon
 			if ( GetActiveTFWeapon() && GetActiveTFWeapon()->GetWeaponID() == TF_WEAPON_PDA_SPY )

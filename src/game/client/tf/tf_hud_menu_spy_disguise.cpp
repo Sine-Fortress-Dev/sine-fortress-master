@@ -550,6 +550,9 @@ void CHudMenuSpyDisguise::ToggleSelectionIcons( bool bGroup )
 //-----------------------------------------------------------------------------
 void CHudMenuSpyDisguise::SelectDisguise( int iClass, int iTeam )
 {
+	// too large
+	if(iClass > TF_CLASS_RUSHER) return;
+
 	CTFPlayer *pPlayer = C_TFPlayer::GetLocalTFPlayer();
 	if ( pPlayer )
 	{
@@ -562,7 +565,15 @@ void CHudMenuSpyDisguise::SelectDisguise( int iClass, int iTeam )
 			iTeam = ( iTeam == 1 ) ? TF_TEAM_BLUE : TF_TEAM_RED;
 		}
 
-		Q_snprintf( szDisguise, sizeof (szDisguise), "disguise 2%d%d", iTeam, iClass );
+		// bit flags for disguise to support >9 classes
+		// first 3 bits set, 4th bit is team
+		int iDisguiseFlags = 7 << 5 | (iTeam == TF_TEAM_BLUE ? 1 << 4 : 0);
+
+		// 4 remaining bits are class
+		iDisguiseFlags |= iClass;
+
+		// send to server as an impulse usercmd
+		Q_snprintf( szDisguise, sizeof (szDisguise), "disguise %d", iDisguiseFlags );
 
 		CCommand args;
 		args.Tokenize( szDisguise );
