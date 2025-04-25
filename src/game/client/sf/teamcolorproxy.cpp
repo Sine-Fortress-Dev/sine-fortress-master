@@ -21,9 +21,9 @@ ConVar sf_menu_rgb_color("sf_menu_rgb_color", "76 122 75", FCVAR_CLIENTDLL, "Set
 //that uses the enemy's custom team color for the TeamColor proxy -Vruk
 namespace VruksStupidUIHack
 {
-	static bool state;
-	bool GetState() { return state; }
-	void SetState(bool newState) { state = newState; }
+	static int m_iTeamOverride;	
+	int GetTeamOverride() { return m_iTeamOverride; }
+	void SetTeamOverride(int iTeamOverride) { m_iTeamOverride = iTeamOverride; }
 };
 
 //-----------------------------------------------------------------------------
@@ -114,13 +114,9 @@ int CEntityTeamColorProxy::GetDisplayTeamNum(void* pC_BaseEntity)
 	}
 	else // Usually a vgui element?
 	{
-		iTeamNum = GetLocalPlayerTeam();
-		if (VruksStupidUIHack::GetState())
-		{
-			//Swap the team number
-			iTeamNum = (iTeamNum == TF_TEAM_BLUE ? TF_TEAM_RED : TF_TEAM_BLUE);
-		}
-		
+		// @Kiwano - use a team override if set, otherwise fallback to local player's team
+		int iTeamNumOverride = VruksStupidUIHack::GetTeamOverride();
+		iTeamNum = iTeamNumOverride != TEAM_INVALID ? iTeamNumOverride : GetLocalPlayerTeam();		
 	}
 
 	return iTeamNum;
@@ -136,7 +132,7 @@ void CEntityTeamColorProxy::OnBind(void* pC_BaseEntity)
 		return;
 	}
 
-	Vector color;
+	Vector color = Vector(0, 0, 0);
 
 	switch (iTeamNum)
 	{

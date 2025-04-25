@@ -27,13 +27,17 @@ public:
 
 	virtual void ApplySettings( KeyValues *inResourceData );
 	void UpdateBGImage( void );
-	void SetBGTeam( int iTeam ) { m_iBGTeam = iTeam; }
+	void SetBGTeam( int iTeamNum );
 
 public: // IGameEventListener Interface
 	virtual void FireGameEvent( IGameEvent * event );
 
+protected:
+	virtual void PaintBackground();
+
 public:
 	char	m_szTeamBG[TF_TEAM_COUNT][MAX_BG_LENGTH];
+	char	m_szTeamCustomBG[MAX_BG_LENGTH];
 	int		m_iBGTeam;
 };
 

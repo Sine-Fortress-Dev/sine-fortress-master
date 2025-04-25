@@ -19,6 +19,9 @@
 #include "tf_imagepanel.h"
 #include "c_tf_player.h"
 
+#include "tf_gamerules.h"
+#include "sf/sf_vruksstupiduihack.h"
+
 using namespace vgui;
 
 DECLARE_BUILD_FACTORY( CTFImagePanel );
@@ -32,11 +35,13 @@ CTFImagePanel::CTFImagePanel( Panel *parent, const char *name ) : ScalableImageP
 	{
 		m_szTeamBG[i][0] = '\0';
 	}
+	m_szTeamCustomBG[0] = '\0';
 
 	C_TFPlayer *pPlayer = ToTFPlayer( C_BasePlayer::GetLocalPlayer() );
 	m_iBGTeam = pPlayer ? pPlayer->GetTeamNumber() : TEAM_UNASSIGNED;
 
 	ListenForGameEvent( "localplayer_changeteam" );
+	ListenForGameEvent( "colors_updated" );
 }
 
 //-----------------------------------------------------------------------------
@@ -54,6 +59,14 @@ void CTFImagePanel::ApplySettings( KeyValues *inResourceData )
 		}
 	}
 
+	// @Kiwano adding support for custom (RGB) team colors in vgui elements
+	Q_strncpy( m_szTeamCustomBG, inResourceData->GetString( "teambg_custom", "" ), sizeof( m_szTeamCustomBG ) );
+
+	if ( m_szTeamCustomBG[0] )
+	{
+		PrecacheMaterial( VarArgs( "vgui/%s", m_szTeamCustomBG ) );
+	}
+
 	BaseClass::ApplySettings( inResourceData );
 
 	UpdateBGImage();
@@ -66,11 +79,48 @@ void CTFImagePanel::UpdateBGImage( void )
 {
 	if ( m_iBGTeam >= 0 && m_iBGTeam < TF_TEAM_COUNT )
 	{
+		if (m_iBGTeam == TF_TEAM_BLUE)
+		{
+			if (TFGameRules()->GetBlueTeamHasCustomColor() && m_szTeamCustomBG[0])
+			{
+				SetImage(m_szTeamCustomBG);
+				return;
+			}
+		}
+		else if (m_iBGTeam == TF_TEAM_RED)
+		{
+			if (TFGameRules()->GetRedTeamHasCustomColor() && m_szTeamCustomBG[0])
+			{
+				SetImage(m_szTeamCustomBG);
+				return;
+			}
+		}
+
 		if ( m_szTeamBG[m_iBGTeam] && m_szTeamBG[m_iBGTeam][0] )
 		{
 			SetImage( m_szTeamBG[m_iBGTeam] );
 		}
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CTFImagePanel::SetBGTeam( int iTeamNum )
+{
+	if (iTeamNum >= 0 && iTeamNum < TF_TEAM_COUNT)
+	{
+		m_iBGTeam = iTeamNum;
+	}
+}
+
+void CTFImagePanel::PaintBackground()
+{
+	// @Kiwano This is a hack to get around usage of material proxies
+	// in vgui elements not providing a pointer (can't set color)
+	VruksStupidUIHack::SetTeamOverride(m_iBGTeam);
+	BaseClass::PaintBackground();
+	VruksStupidUIHack::SetTeamOverride(TEAM_INVALID);
 }
 
 //-----------------------------------------------------------------------------
@@ -82,6 +132,10 @@ void CTFImagePanel::FireGameEvent( IGameEvent * event )
 	{
 		C_TFPlayer *pPlayer = ToTFPlayer( C_BasePlayer::GetLocalPlayer() );
 		m_iBGTeam = pPlayer ? pPlayer->GetTeamNumber() : TEAM_UNASSIGNED;
+		UpdateBGImage();
+	}
+	else if (FStrEq( "colors_updated", event->GetName() ) )
+	{
 		UpdateBGImage();
 	}
 }

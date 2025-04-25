@@ -5,7 +5,7 @@
 //See TeamColorProxy -Vruk, Sine Fortress
 namespace VruksStupidUIHack
 {
-	extern bool GetState();
-	extern void SetState(bool state);
+	extern int GetTeamOverride();
+	extern void SetTeamOverride(int iTeamOverride);
 }
 #endif

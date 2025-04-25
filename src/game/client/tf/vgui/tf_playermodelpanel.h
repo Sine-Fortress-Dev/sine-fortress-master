@@ -19,7 +19,7 @@ class CChoreoScene;
 extern CMouthInfo g_ClientUIMouth;
 
 // A model panel that knows how to imitate a TF2 player, including wielding/wearing unlockable items.
-class CTFPlayerModelPanel : public CBaseModelPanel, public IChoreoEventCallback, public IHasLocalToGlobalFlexSettings, public IModelLoadCallback
+class CTFPlayerModelPanel : public CBaseModelPanel, public IChoreoEventCallback, public IHasLocalToGlobalFlexSettings, public IModelLoadCallback, public CGameEventListener
 {
 	DECLARE_CLASS_SIMPLE( CTFPlayerModelPanel, CBaseModelPanel );
 public:
@@ -73,6 +73,9 @@ public:
 	void			SetEyeGlowEffect ( const char *pEffectName, Vector vColor1, Vector vColor2, bool bForceUpdate, bool bPlaySparks );
 
 	void	InvalidateParticleEffects();
+
+	// IGameEventListener Interface
+	virtual void FireGameEvent( IGameEvent * event );
 
 protected:
 	// From CBaseModelPanel

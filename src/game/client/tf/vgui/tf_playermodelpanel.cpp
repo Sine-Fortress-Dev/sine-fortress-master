@@ -29,6 +29,9 @@
 #include "halloween/tf_weapon_spellbook.h"
 #include "matsys_controls/matsyscontrols.h"
 
+#include "tf_gamerules.h"
+#include "sf/sf_vruksstupiduihack.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
@@ -138,6 +141,8 @@ CTFPlayerModelPanel::CTFPlayerModelPanel( vgui::Panel *pParent, const char *pNam
 	m_bDrawActionSlotEffects = false;
 	m_bDrawTauntParticles = false;
 	m_strPlayerModelOverride = "";
+
+	ListenForGameEvent( "colors_updated" );
 }
 
 //-----------------------------------------------------------------------------
@@ -1222,7 +1227,21 @@ void CTFPlayerModelPanel::SetTeam( int iTeam )
 void CTFPlayerModelPanel::UpdatePreviewVisuals()
 {
 	// Assume skin will be chosen based only on the preview team
-	int iSkin = m_iTeam == TF_TEAM_RED ? 0 : 1;
+	int iSkin = 0;
+
+	// @Kiwano - handle RGB custom team colors
+	if ( m_iTeam == TF_TEAM_RED )
+	{
+		if (TFGameRules()->GetRedTeamHasCustomColor())
+			iSkin = 2;
+	}
+	else
+	{
+		if (TFGameRules()->GetBlueTeamHasCustomColor())
+			iSkin = 2;
+		else
+			iSkin = 1;
+	}
 
 	// Check if any of the items we're carrying should override this
 	static CSchemaAttributeDefHandle pAttrDef_PlayerSkinOverride( "player skin override" );
@@ -1324,6 +1343,10 @@ Vector CTFPlayerModelPanel::GetZoomOffset()
 //-----------------------------------------------------------------------------
 void CTFPlayerModelPanel::PrePaint3D( IMatRenderContext *pRenderContext )
 {
+	// @Kiwano This is a hack to get around usage of material proxies
+	// in vgui elements not providing a pointer (can't set color)
+	VruksStupidUIHack::SetTeamOverride(m_iTeam);
+
 	if ( g_PlayerPreviewEffect.GetEffect() == C_TFPlayerPreviewEffect::PREVIEW_EFFECT_UBER )
 	{
 		modelrender->ForcedMaterialOverride( *g_PlayerPreviewEffect.GetInvulnMaterialRef() );
@@ -1377,6 +1400,8 @@ void CTFPlayerModelPanel::PostPaint3D( IMatRenderContext *pRenderContext )
 	}
 
 	BaseClass::PostPaint3D( pRenderContext );
+	
+	VruksStupidUIHack::SetTeamOverride(TEAM_INVALID);
 }
 
 //-----------------------------------------------------------------------------
@@ -1855,6 +1880,17 @@ void CTFPlayerModelPanel::InvalidateParticleEffects()
 		{
 			SafeDeleteParticleData( &m_aParticleSystems[i] );
 		}
+	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CTFPlayerModelPanel::FireGameEvent( IGameEvent * event )
+{
+	if (FStrEq( "colors_updated", event->GetName() ) )
+	{
+		UpdatePreviewVisuals();
 	}
 }
 
