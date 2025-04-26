@@ -1227,20 +1227,21 @@ void CTFPlayerModelPanel::SetTeam( int iTeam )
 void CTFPlayerModelPanel::UpdatePreviewVisuals()
 {
 	// Assume skin will be chosen based only on the preview team
-	int iSkin = 0;
-
+	int iSkin = m_iTeam == TF_TEAM_RED ? 0 : 1;
+	
 	// @Kiwano - handle RGB custom team colors
-	if ( m_iTeam == TF_TEAM_RED )
+	if(TFGameRules())
 	{
-		if (TFGameRules()->GetRedTeamHasCustomColor())
-			iSkin = 2;
-	}
-	else
-	{
-		if (TFGameRules()->GetBlueTeamHasCustomColor())
-			iSkin = 2;
+		if ( m_iTeam == TF_TEAM_RED )
+		{
+			if (TFGameRules()->GetRedTeamHasCustomColor())
+				iSkin = 2;
+		}
 		else
-			iSkin = 1;
+		{
+			if (TFGameRules()->GetBlueTeamHasCustomColor())
+				iSkin = 2;
+		}
 	}
 
 	// Check if any of the items we're carrying should override this
