@@ -41,6 +41,9 @@ END_DATADESC()
 
 #define TF_WEAPON_GOOGLOB_COUNT 4
 
+#define TF_WEAPON_GOOGUN_CHARGE_UP_SOUND	"Weapon_GooGun.Charge"
+#define TF_WEAPON_GOOGUN_CHARGE_DOWN_SOUND	"Weapon_GooGun.DisCharge"
+
 ConVar sf_googun_ammo_cost_toxic_max("sf_googun_ammo_cost_toxic", "40", FCVAR_REPLICATED, "The maximum ammo the googuns use when fully charged");
 ConVar sf_googun_ammo_cost_movement("sf_googun_ammo_cost_movement", "65", FCVAR_REPLICATED, "The amount of ammo a googun will use to fire a movement goo");
 ConVar sf_googun_goo_max_toxic("sf_googun_goo_max_toxic", "3", FCVAR_REPLICATED, "The number of toxic goos that a scientist can have at one time");
@@ -95,6 +98,10 @@ void CTFGooGun::PrimaryAttack( void )
 		m_flChargeBeginTime = gpGlobals->curtime;
 
 		SendWeaponAnim(ACT_VM_PULLBACK);
+
+#ifdef CLIENT_DLL
+		EmitSound( TF_WEAPON_GOOGUN_CHARGE_UP_SOUND );
+#endif // CLIENT_DLL
 	}
 	else
 	{
@@ -294,6 +301,13 @@ float CTFGooGun::GetCurrentCharge()
 
 bool CTFGooGun::Holster(CBaseCombatWeapon *pSwitchingTo)
 {
+#ifdef CLIENT_DLL
+	if ( m_flChargeBeginTime > 0.f )
+	{
+		StopSound( TF_WEAPON_GOOGUN_CHARGE_UP_SOUND );
+		EmitSound( TF_WEAPON_GOOGUN_CHARGE_DOWN_SOUND );
+	}
+#endif
 	m_flChargeBeginTime = 0;
 
 	return BaseClass::Holster(pSwitchingTo);
@@ -361,7 +375,11 @@ void CTFGooGun::FireGoo( int GooType )
 		m_flChargeBeginTime = 0;
 		return;
 	}
+#endif
 
+#ifdef CLIENT_DLL
+	StopSound( TF_WEAPON_GOOGUN_CHARGE_UP_SOUND );
+#else
 	pPlayer->SpeakWeaponFire();
 	//CTF_GameStats.Event_PlayerFiredWeapon( pPlayer, IsCurrentAttackACrit() );
 #endif
