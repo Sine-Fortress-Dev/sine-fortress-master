@@ -328,26 +328,21 @@ void CTFGooGun::FireGoo( int GooType )
 
 	CalcIsAttackCritical();
 
+	//Do anims
+	SendWeaponAnim(ACT_VM_PRIMARYATTACK);
+	pPlayer->SetAnimation(PLAYER_ATTACK1);
+	pPlayer->DoAnimationEvent(PLAYERANIMEVENT_ATTACK_PRIMARY);
+
 	float flPercentageCharged;
 
 	if (m_iWeaponMode == TF_WEAPON_PRIMARY_MODE)
 	{
-		SendWeaponAnim(ACT_VM_PRIMARYATTACK);
-		pPlayer->DoAnimationEvent(PLAYERANIMEVENT_ATTACK_PRIMARY);
-
 		flPercentageCharged = GetCurrentCharge();
 	}
 	else
 	{
-		//Do anims
-		SendWeaponAnim(ACT_VM_SECONDARYATTACK);
-		pPlayer->DoAnimationEvent(PLAYERANIMEVENT_ATTACK_SECONDARY);
-
 		flPercentageCharged = 0.66;
 	}
-
-	pPlayer->SetAnimation(PLAYER_ATTACK1);
-	
 
 #ifndef GAME_DLL
 	FireProjectile(pPlayer);
