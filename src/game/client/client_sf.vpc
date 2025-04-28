@@ -1014,5 +1014,10 @@ $Project "Client (SF)"
 		$File "$SRCDIR\..\game\tf\resource\ModEvents.res"
 		$File "$SRCDIR\..\game\tf\resource\ClientScheme.res"
 	}
+
+	$Folder	"Link Libraries"
+	{
+		$Lib "$LIBPUBLIC\discord-rpc"
+	}
 }
 
