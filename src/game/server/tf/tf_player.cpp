@@ -4427,6 +4427,12 @@ bool CTFPlayer::ItemIsAllowed( CEconItemView *pItem )
 	int iClass = GetPlayerClass()->GetClassIndex();
 	int iSlot = pItem->GetStaticData()->GetLoadoutSlot(iClass);
 
+	// @Kiwano - Disable all cosmetic slots (hardcoded)
+	// This would fix any future issues with the new models
+	// alongside custom (RGB) team colors being obscured.
+	if( iSlot == LOADOUT_POSITION_HEAD || iSlot == LOADOUT_POSITION_MISC || iSlot == LOADOUT_POSITION_MISC2 )
+		return false;
+
 	// Passtime hack to allow passtime gun
 	if ( V_stristr( pItem->GetItemDefinition()->GetDefinitionName(), "passtime" ) )
 	{
