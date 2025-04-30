@@ -153,6 +153,9 @@ bool CTFHudWeaponAmmo::ShouldDraw( void )
 	if ( pPlayer->m_Shared.InCond( TF_COND_HALLOWEEN_GHOST_MODE ) )
 		return false;
 
+	if(pPlayer->IsPlayerClass(TF_CLASS_SCIENTIST))
+		return false;
+
 	if ( CTFMinigameLogic::GetMinigameLogic() && CTFMinigameLogic::GetMinigameLogic()->GetActiveMinigame() )
 		return false;
 

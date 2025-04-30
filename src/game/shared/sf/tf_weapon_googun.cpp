@@ -326,6 +326,8 @@ void CTFGooGun::FireGoo( int GooType )
 	if ( !pPlayer )
 		return;
 
+	m_flLastFireTime = gpGlobals->curtime;
+
 	CalcIsAttackCritical();
 
 	//Do anims

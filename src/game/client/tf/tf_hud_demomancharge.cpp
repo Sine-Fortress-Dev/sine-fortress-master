@@ -85,7 +85,7 @@ bool CHudDemomanChargeMeter::ShouldDraw( void )
 
 	CTFWeaponBase *pWpn = pPlayer->GetActiveTFWeapon();
 	ITFChargeUpWeapon *pChargeupWeapon = dynamic_cast< ITFChargeUpWeapon *>( pWpn );
-	if ( !pWpn || !pChargeupWeapon || !pChargeupWeapon->CanCharge() )
+	if ( !pWpn || !pChargeupWeapon || !pChargeupWeapon->CanCharge() || !pWpn->IsWeapon(TF_WEAPON_PIPEBOMBLAUNCHER))
 		return false;
 
 

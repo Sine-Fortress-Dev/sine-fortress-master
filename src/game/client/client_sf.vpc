@@ -227,6 +227,7 @@ $Project "Client (SF)"
 			$File	"$SRCDIR\game\shared\sf\tf_projectile_energy_laser.h"
 			$File	"$SRCDIR\game\client\sf\sf_vruksstupiduihack.h"
 			$File	"$SRCDIR\game\client\sf\teamcolorproxy.cpp"
+			$File	"$SRCDIR\game\client\sf\sf_hud_scientistcharge.cpp"
 		}
 
 		$Folder	"TF"
