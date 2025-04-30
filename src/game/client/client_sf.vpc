@@ -18,6 +18,8 @@ $Include "$SRCDIR\game\client\client_econ_base.vpc"
 $Include "$SRCDIR\vpc_scripts\source_saxxyawards.vpc" [!$SOURCESDK]
 $Include "$SRCDIR\utils\itemtest_lib\itemtest_lib_support.vpc" [$WORKSHOP_IMPORT_ENABLE]
 
+$Macro "DEFAULT_RUN_ARGS" "-dev -allowdebug -sw -w 1920 -h 1080 -windowed -novid" 
+
 $Configuration
 {
 	$Compiler
