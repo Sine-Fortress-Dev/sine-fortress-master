@@ -1017,7 +1017,8 @@ $Project "Client (SF)"
 
 	$Folder	"Link Libraries"
 	{
-		$Lib "$LIBPUBLIC\discord-rpc"
+		$Lib "$LIBPUBLIC\discord-rpc" [$WIN32 || $WIN64]
+		$Lib "$LIBPUBLIC\libdiscord-rpc" [$LINUXALL]
 	}
 }
 
