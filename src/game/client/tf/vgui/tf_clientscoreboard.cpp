@@ -1033,12 +1033,22 @@ void CTFClientScoreBoardDialog::UpdateTeamInfo()
 
 	bool bMvM = TFGameRules() && TFGameRules()->IsMannVsMachineMode();
 	bool bTournament = mp_tournament.GetBool() && !bMvM;
-	if ( m_pRedTeamName->IsVisible() != bTournament )
+
+
+	if(TFGameRules() && TFGameRules()->GetRedTeamHasCustomName())
+	{
+		m_pRedTeamName->SetVisible(true);
+	}
+	else if ( m_pRedTeamName->IsVisible() != bTournament )
 	{
 		m_pRedTeamName->SetVisible( bTournament );
 	}
 
-	if ( m_pBlueTeamName->IsVisible() != bTournament )
+	if(TFGameRules() && TFGameRules()->GetBlueTeamHasCustomName())
+	{
+		m_pBlueTeamName->SetVisible(true);
+	}
+	else if ( m_pBlueTeamName->IsVisible() != bTournament )
 	{
 		m_pBlueTeamName->SetVisible( bTournament );
 	}

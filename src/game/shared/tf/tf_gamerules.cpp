@@ -1448,8 +1448,13 @@ BEGIN_NETWORK_TABLE_NOBASE( CTFGameRules, DT_TFGameRules )
 
 	RecvPropVector(RECVINFO(m_rgbBlueColor)),
 	RecvPropVector(RECVINFO(m_rgbRedColor)),
-	RecvPropVector(RECVINFO(m_bBlueCustomColor)),
-	RecvPropVector(RECVINFO(m_bRedCustomColor)),
+	RecvPropBool(RECVINFO(m_bBlueCustomColor)),
+	RecvPropBool(RECVINFO(m_bRedCustomColor)),
+
+	RecvPropString(RECVINFO(m_pszBlueTeamName)),
+	RecvPropString(RECVINFO(m_pszRedTeamName)),
+	RecvPropBool(RECVINFO(m_bBlueCustomName)),
+	RecvPropBool(RECVINFO(m_bRedCustomName)),
 #else
 
 	SendPropInt( SENDINFO( m_nGameType ), 4, SPROP_UNSIGNED ),
@@ -1522,8 +1527,13 @@ BEGIN_NETWORK_TABLE_NOBASE( CTFGameRules, DT_TFGameRules )
 
 	SendPropVector(SENDINFO(m_rgbBlueColor)),
 	SendPropVector(SENDINFO(m_rgbRedColor)),
-	SendPropVector(SENDINFO(m_bBlueCustomColor)),
-	SendPropVector(SENDINFO(m_bRedCustomColor)),
+	SendPropBool(SENDINFO(m_bBlueCustomColor)),
+	SendPropBool(SENDINFO(m_bRedCustomColor)),
+
+	SendPropString(SENDINFO(m_pszBlueTeamName)),
+	SendPropString(SENDINFO(m_pszRedTeamName)),
+	SendPropBool(SENDINFO(m_bBlueCustomName)),
+	SendPropBool(SENDINFO(m_bRedCustomName)),
 #endif
 END_NETWORK_TABLE()
 
@@ -1573,6 +1583,11 @@ BEGIN_DATADESC( CTFGameRulesProxy )
 	DEFINE_KEYFIELD(m_bCustomRedColor, FIELD_BOOLEAN, "has_custom_red_color"),
 	DEFINE_KEYFIELD(m_rgbBlueColor, FIELD_COLOR32, "blue_color"),
 	DEFINE_KEYFIELD(m_rgbRedColor, FIELD_COLOR32, "red_color"),
+	
+	DEFINE_KEYFIELD(m_bCustomBlueName, FIELD_BOOLEAN, "has_custom_blue_name"),
+	DEFINE_KEYFIELD(m_bCustomRedName, FIELD_BOOLEAN, "has_custom_red_name"),
+	DEFINE_KEYFIELD(m_iszBlueTeamName, FIELD_STRING, "blue_name"),
+	DEFINE_KEYFIELD(m_iszRedTeamName, FIELD_STRING, "red_name"),
 
 	// Inputs.
 	DEFINE_INPUTFUNC( FIELD_FLOAT, "SetRedTeamRespawnWaveTime", InputSetRedTeamRespawnWaveTime ),
@@ -1601,6 +1616,11 @@ BEGIN_DATADESC( CTFGameRulesProxy )
 	DEFINE_INPUTFUNC(FIELD_VECTOR, "SetRedTeamColor", InputSetRedTeamCustomColor),
 	DEFINE_INPUTFUNC(FIELD_BOOLEAN, "SetBlueTeamCustomColorActive", InputSetBlueTeamCustomColorActive),
 	DEFINE_INPUTFUNC(FIELD_BOOLEAN, "SetRedTeamCustomColorActive", InputSetRedTeamCustomColorActive),
+
+	DEFINE_INPUTFUNC(FIELD_STRING, "SetBlueTeamName", InputSetBlueTeamCustomName),
+	DEFINE_INPUTFUNC(FIELD_STRING, "SetRedTeamName", InputSetRedTeamCustomName),
+	DEFINE_INPUTFUNC(FIELD_BOOLEAN, "SetBlueTeamCustomNameActive", InputSetBlueTeamCustomNameActive),
+	DEFINE_INPUTFUNC(FIELD_BOOLEAN, "SetRedTeamCustomNameActive", InputSetRedTeamCustomNameActive),
 
 	DEFINE_OUTPUT( m_OnWonByTeam1,	"OnWonByTeam1" ),
 	DEFINE_OUTPUT( m_OnWonByTeam2,	"OnWonByTeam2" ),
@@ -1888,6 +1908,34 @@ void CTFGameRulesProxy::InputSetRedTeamCustomColorActive(inputdata_t& inputdata)
 	TFGameRules()->SetRedTeamHasCustomColor(inputdata.value.Bool());
 }
 
+void CTFGameRulesProxy::InputSetBlueTeamCustomName(inputdata_t& inputdata)
+{
+	string_t teamname = inputdata.value.StringID();
+	if ( teamname != NULL_STRING )
+	{
+		TFGameRules()->SetBlueTeamName(STRING(teamname));
+	}
+}
+
+void CTFGameRulesProxy::InputSetRedTeamCustomName(inputdata_t& inputdata)
+{
+	string_t teamname = inputdata.value.StringID();
+	if ( teamname != NULL_STRING )
+	{
+		TFGameRules()->SetRedTeamName(STRING(teamname));
+	}
+}
+
+void CTFGameRulesProxy::InputSetBlueTeamCustomNameActive(inputdata_t& inputdata)
+{
+	TFGameRules()->SetBlueTeamHasCustomName(inputdata.value.Bool());
+}
+
+void CTFGameRulesProxy::InputSetRedTeamCustomNameActive(inputdata_t& inputdata)
+{
+	TFGameRules()->SetRedTeamHasCustomName(inputdata.value.Bool());
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
@@ -1934,6 +1982,22 @@ void CTFGameRulesProxy::Activate()
 	TFGameRules()->SetRedTeamHasCustomColor(m_bCustomRedColor);
 	TFGameRules()->SetBlueTeamColor(blueColor);
 	TFGameRules()->SetRedTeamColor(redColor);
+
+	const char* blueName = "BLU";
+	const char* redName = "RED";
+	if (m_bCustomBlueName)
+	{
+		blueName = STRING(m_iszBlueTeamName);
+	}
+	if (m_bCustomRedName)
+	{
+		redName = STRING(m_iszBlueTeamName);
+	}
+
+	TFGameRules()->SetBlueTeamHasCustomName(m_bCustomBlueName);
+	TFGameRules()->SetRedTeamHasCustomName(m_bCustomRedName);
+	TFGameRules()->SetBlueTeamName(blueName);
+	TFGameRules()->SetRedTeamName(redName);
 
 	BaseClass::Activate();
 }
@@ -18560,7 +18624,7 @@ void CTFGameRules::OnDataChanged( DataUpdateType_t updateType )
 	if (updateType == DATA_UPDATE_DATATABLE_CHANGED)
 	{
 		if (m_rgbBlueColorOld != m_rgbBlueColor || m_rgbRedColorOld != m_rgbRedColor ||
-			m_bBlueCustomColorOld != m_bBlueCustomColor || m_bRedCustomColorOld != m_bRedCustomColor)
+			m_bBlueCustomColorOld != m_bBlueCustomColor.Get() || m_bRedCustomColorOld != m_bRedCustomColor.Get())
 		{
 			IGameEvent* event = gameeventmanager->CreateEvent("colors_updated");
 			if (event)
@@ -18570,8 +18634,22 @@ void CTFGameRules::OnDataChanged( DataUpdateType_t updateType )
 
 			m_rgbBlueColorOld = m_rgbBlueColor;
 			m_rgbRedColorOld = m_rgbRedColor;
-			m_bBlueCustomColorOld = m_bBlueCustomColor;
-			m_bRedCustomColorOld = m_bRedCustomColor;
+			m_bBlueCustomColorOld = m_bBlueCustomColor.Get();
+			m_bRedCustomColorOld = m_bRedCustomColor.Get();
+		}
+		if (m_pszBlueTeamNameOld != m_pszBlueTeamName || m_pszRedTeamNameOld != m_pszRedTeamNameOld ||
+			m_bBlueCustomNameOld != m_bBlueCustomName.Get() || m_bRedCustomNameOld != m_bRedCustomName.Get())
+		{
+			IGameEvent* event = gameeventmanager->CreateEvent("names_updated");
+			if (event)
+			{
+				gameeventmanager->FireEventClientSide(event);
+			}
+
+			strcpy(m_pszBlueTeamNameOld, m_pszBlueTeamName);
+			strcpy(m_pszRedTeamNameOld, m_pszRedTeamName);
+			m_bBlueCustomNameOld = m_bBlueCustomName.Get();
+			m_bRedCustomNameOld = m_bRedCustomName.Get();
 		}
 	}
 }

@@ -182,6 +182,11 @@ public:
 	void	InputSetBlueTeamCustomColorActive(inputdata_t& inputdata);
 	void	InputSetRedTeamCustomColorActive(inputdata_t& inputdata);
 
+	void	InputSetBlueTeamCustomName(inputdata_t& inputdata);
+	void	InputSetRedTeamCustomName(inputdata_t& inputdata);
+	void	InputSetBlueTeamCustomNameActive(inputdata_t& inputdata);
+	void	InputSetRedTeamCustomNameActive(inputdata_t& inputdata);
+
 	void	TeamPlayerCountChanged( CTFTeam *pTeam );
 	void	PowerupTeamImbalance( int nTeam );
 	void	StateEnterRoundRunning( void );
@@ -229,6 +234,11 @@ private:
 	bool	m_bCustomRedColor;
 	color32	m_rgbBlueColor;
 	color32	m_rgbRedColor;
+
+	bool	m_bCustomBlueName;
+	bool	m_bCustomRedName;
+	string_t m_iszBlueTeamName;
+	string_t m_iszRedTeamName;
 #endif
 
 public: // IGameEventListener Interface
@@ -778,6 +788,27 @@ bool IsCreepWaveMode( void ) const;
 		m_rgbRedColor.Set(color);
 	}
 
+	const char* GetBlueTeamName(void) { return m_pszBlueTeamName.Get(); }
+	const char* GetRedTeamName(void) { return m_pszRedTeamName.Get(); }
+	bool GetBlueTeamHasCustomName() { return m_bBlueCustomName; }
+	bool GetRedTeamHasCustomName() { return m_bRedCustomName; }
+	void CTFGameRules::SetBlueTeamHasCustomName(bool hasCustom)
+	{
+		m_bBlueCustomName.Set(hasCustom);
+	}
+	void CTFGameRules::SetRedTeamHasCustomName(bool hasCustom)
+	{
+		m_bRedCustomName.Set(hasCustom);
+	}
+	void CTFGameRules::SetBlueTeamName(const char* name)
+	{
+		V_strncpy( m_pszBlueTeamName.GetForModify(), name, MAX_TEAM_NAME_LENGTH );
+	}
+	void CTFGameRules::SetRedTeamName(const char* name)
+	{
+		V_strncpy( m_pszRedTeamName.GetForModify(), name, MAX_TEAM_NAME_LENGTH );
+	}
+
 	enum ENextMapVotingState
 	{
 		NEXT_MAP_VOTE_STATE_NONE,
@@ -1269,11 +1300,21 @@ private:
 	CNetworkVar(bool, m_bBlueCustomColor);
 	CNetworkVar(bool, m_bRedCustomColor);
 
+	CNetworkString(m_pszBlueTeamName, MAX_TEAM_NAME_LENGTH); 
+	CNetworkString(m_pszRedTeamName, MAX_TEAM_NAME_LENGTH);
+	CNetworkVar(bool, m_bBlueCustomName);
+	CNetworkVar(bool, m_bRedCustomName);
+
 #ifndef GAME_DLL
 	Vector m_rgbBlueColorOld;
 	Vector m_rgbRedColorOld;
 	bool m_bBlueCustomColorOld;
 	bool m_bRedCustomColorOld;
+
+	char m_pszBlueTeamNameOld[MAX_TEAM_NAME_LENGTH];
+	char m_pszRedTeamNameOld[MAX_TEAM_NAME_LENGTH];
+	bool m_bBlueCustomNameOld;
+	bool m_bRedCustomNameOld;
 #endif
 public:
 
