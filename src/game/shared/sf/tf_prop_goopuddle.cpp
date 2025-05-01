@@ -115,8 +115,8 @@ void CTFPropGooPuddle::RecalculateBounds()
 
 void CTFPropGooPuddle::AffectEntitiesInBounds()
 {
-	CBaseEntity* pEnt[256];
-	int iNumberOfNearbyEntities = UTIL_EntitiesInBox(pEnt, 256, m_minBounds, m_maxBounds, 0);
+	CBaseEntity* pEnt[1024];
+	int iNumberOfNearbyEntities = UTIL_EntitiesInBox(pEnt, ARRAYSIZE(pEnt), m_minBounds, m_maxBounds, 0);
 
 	/*for (int i = 0; i < 256; i++)
 	{
