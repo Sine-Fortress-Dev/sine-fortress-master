@@ -39,6 +39,7 @@ public:
 	char	m_szTeamBG[TF_TEAM_COUNT][MAX_BG_LENGTH];
 	char	m_szTeamCustomBG[MAX_BG_LENGTH];
 	int		m_iBGTeam;
+	int 	m_iBGTeamFromSettings;
 };
 
 

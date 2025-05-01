@@ -7210,15 +7210,35 @@ void C_TFPlayer::GetTeamColor( Color &color )
 
 	if ( GetTeamNumber() == TF_TEAM_RED )
 	{
-		color[0] = 159;
-		color[1] = 55;
-		color[2] = 34;
+		if ( TFGameRules() && TFGameRules()->GetRedTeamHasCustomColor() )
+		{
+			Vector c = TFGameRules()->GetRedTeamColor();
+			color[0] = c.x;
+			color[1] = c.y;
+			color[2] = c.z;
+		}
+		else
+		{
+			color[0] = 159;
+			color[1] = 55;
+			color[2] = 34;
+		}
 	}
 	else if ( GetTeamNumber() == TF_TEAM_BLUE )
 	{
-		color[0] = 76;
-		color[1] = 109;
-		color[2] = 129;
+		if ( TFGameRules() && TFGameRules()->GetBlueTeamHasCustomColor() )
+		{
+			Vector c = TFGameRules()->GetBlueTeamColor();
+			color[0] = c.x;
+			color[1] = c.y;
+			color[2] = c.z;
+		}
+		else
+		{
+			color[0] = 76;
+			color[1] = 109;
+			color[2] = 129;
+		}
 	}
 	else
 	{

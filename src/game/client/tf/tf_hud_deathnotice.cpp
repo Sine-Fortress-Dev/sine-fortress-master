@@ -1583,9 +1583,25 @@ Color CTFHudDeathNotice::GetTeamColor( int iTeamNumber, bool bLocalPlayerInvolve
 	switch ( iTeamNumber )
 	{
 	case TF_TEAM_BLUE:
+		if ( TFGameRules() )
+		{
+			if(TFGameRules()->GetBlueTeamHasCustomColor())
+			{
+				Vector c = TFGameRules()->GetBlueTeamColor();
+				return Color(c.x, c.y, c.z, 255);
+			}
+		}
 		return m_clrBlueText;
 		break;
 	case TF_TEAM_RED:
+		if ( TFGameRules() )
+		{
+			if(TFGameRules()->GetRedTeamHasCustomColor())
+			{
+				Vector c = TFGameRules()->GetRedTeamColor();
+				return Color(c.x, c.y, c.z, 255);
+			}
+		}
 		return m_clrRedText;
 		break;
 	case TEAM_UNASSIGNED:

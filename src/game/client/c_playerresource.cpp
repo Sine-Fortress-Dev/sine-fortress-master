@@ -323,7 +323,7 @@ int	C_PlayerResource::GetHealth( int iIndex )
 	return m_iHealth[iIndex];
 }
 
-const Color &C_PlayerResource::GetTeamColor(int index_ )
+Color &C_PlayerResource::GetTeamColor(int index_ )
 {
 	if ( index_ < 0 || index_ >= MAX_TEAMS )
 	{

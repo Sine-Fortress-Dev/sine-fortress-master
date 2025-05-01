@@ -580,7 +580,22 @@ void CTFFreezePanel::FireGameEvent( IGameEvent * event )
 			if ( m_pFreezePanelBG )
 			{
 				// use the killer's team for the background color
-				m_pFreezePanelBG->SetImage( pKiller->GetTeamNumber() == TF_TEAM_BLUE ? "../hud/color_panel_blu" : "../hud/color_panel_red" );
+				int iKillerTeamNum = pKiller->GetTeamNumber();
+				bool bCustomPanelSet = false;
+				if ( TFGameRules() )
+				{
+					if((iKillerTeamNum == TF_TEAM_BLUE && TFGameRules()->GetBlueTeamHasCustomColor())
+						|| (iKillerTeamNum == TF_TEAM_RED && TFGameRules()->GetRedTeamHasCustomColor()))
+					{
+						m_pFreezePanelBG->SetBGTeam(iKillerTeamNum);
+						m_pFreezePanelBG->SetImage("../hud/color_panel_custom");
+						bCustomPanelSet = true;
+					}
+				}
+				if(!bCustomPanelSet)
+				{
+					m_pFreezePanelBG->SetImage( iKillerTeamNum == TF_TEAM_BLUE ? "../hud/color_panel_blu" : "../hud/color_panel_red" );
+				}
 			}
 
 			if ( m_pAvatar )

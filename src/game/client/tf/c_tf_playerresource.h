@@ -25,7 +25,8 @@ public:
 	virtual ~C_TF_PlayerResource();
 
 	virtual int	GetTeam( int index ) OVERRIDE;
-
+	virtual Color&GetTeamColor( int index ) OVERRIDE;
+	
 	int	GetTotalScore( int iIndex ) { return GetArrayValue( iIndex, m_iTotalScore, 0 ); }
 	int GetMaxHealth( int iIndex )   { return GetArrayValue( iIndex, m_iMaxHealth, TF_HEALTH_UNDEFINED ); }
 	int GetMaxHealthForBuffing( int iIndex )   { return GetArrayValue( iIndex, m_iMaxBuffedHealth, TF_HEALTH_UNDEFINED ); }

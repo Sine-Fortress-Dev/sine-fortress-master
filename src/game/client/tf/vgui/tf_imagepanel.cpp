@@ -39,6 +39,7 @@ CTFImagePanel::CTFImagePanel( Panel *parent, const char *name ) : ScalableImageP
 
 	C_TFPlayer *pPlayer = ToTFPlayer( C_BasePlayer::GetLocalPlayer() );
 	m_iBGTeam = pPlayer ? pPlayer->GetTeamNumber() : TEAM_UNASSIGNED;
+	m_iBGTeamFromSettings = TEAM_INVALID;
 
 	ListenForGameEvent( "localplayer_changeteam" );
 	ListenForGameEvent( "colors_updated" );
@@ -67,6 +68,8 @@ void CTFImagePanel::ApplySettings( KeyValues *inResourceData )
 		PrecacheMaterial( VarArgs( "vgui/%s", m_szTeamCustomBG ) );
 	}
 
+	m_iBGTeamFromSettings = inResourceData->GetInt("teamoverride", TEAM_INVALID);
+
 	BaseClass::ApplySettings( inResourceData );
 
 	UpdateBGImage();
@@ -77,22 +80,30 @@ void CTFImagePanel::ApplySettings( KeyValues *inResourceData )
 //-----------------------------------------------------------------------------
 void CTFImagePanel::UpdateBGImage( void )
 {
+	if(m_iBGTeamFromSettings != TEAM_INVALID)
+	{
+		m_iBGTeam = m_iBGTeamFromSettings;
+	}
+	
 	if ( m_iBGTeam >= 0 && m_iBGTeam < TF_TEAM_COUNT )
 	{
-		if (m_iBGTeam == TF_TEAM_BLUE)
+		if (TFGameRules())
 		{
-			if (TFGameRules()->GetBlueTeamHasCustomColor() && m_szTeamCustomBG[0])
+			if (m_iBGTeam == TF_TEAM_BLUE)
 			{
-				SetImage(m_szTeamCustomBG);
-				return;
+				if (TFGameRules()->GetBlueTeamHasCustomColor() && m_szTeamCustomBG[0])
+				{
+					SetImage(m_szTeamCustomBG);
+					return;
+				}
 			}
-		}
-		else if (m_iBGTeam == TF_TEAM_RED)
-		{
-			if (TFGameRules()->GetRedTeamHasCustomColor() && m_szTeamCustomBG[0])
+			else if (m_iBGTeam == TF_TEAM_RED)
 			{
-				SetImage(m_szTeamCustomBG);
-				return;
+				if (TFGameRules()->GetRedTeamHasCustomColor() && m_szTeamCustomBG[0])
+				{
+					SetImage(m_szTeamCustomBG);
+					return;
+				}
 			}
 		}
 

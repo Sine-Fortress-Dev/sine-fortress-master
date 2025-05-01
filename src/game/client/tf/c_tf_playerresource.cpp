@@ -105,6 +105,33 @@ int C_TF_PlayerResource::GetTeam( int iIndex )
 	return iTeam;
 }
 
+
+Color &C_TF_PlayerResource::GetTeamColor(int index_ )
+{
+	if ( TFGameRules() )
+	{
+		if(TFGameRules()->GetRedTeamHasCustomColor())
+		{
+			Vector c = TFGameRules()->GetRedTeamColor();
+			m_Colors[TF_TEAM_RED] = Color(c.x, c.y, c.z, 255);
+		}
+		else
+		{
+			m_Colors[TF_TEAM_RED] = COLOR_RED;
+		}
+		if(TFGameRules()->GetBlueTeamHasCustomColor())
+		{
+			Vector c = TFGameRules()->GetBlueTeamColor();
+			m_Colors[TF_TEAM_BLUE] = Color(c.x, c.y, c.z, 255);
+		}
+		else
+		{
+			m_Colors[TF_TEAM_BLUE] = COLOR_BLUE;
+		}
+	}
+	return BaseClass::GetTeamColor(index_);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
