@@ -456,13 +456,20 @@ void CObjectDispenser::GetControlPanelInfo( int nPanelIndex, const char *&pPanel
 	// Panels 0 and 1 are both control panels for now
 	if ( nPanelIndex == 0 || nPanelIndex == 1 )
 	{
+		CTFGameRules* pGameRules = TFGameRules();
 		if ( GetTeamNumber() == TF_TEAM_RED )
 		{
-			pPanelName = "screen_obj_dispenser_red";
+			if(pGameRules && pGameRules->GetRedTeamHasCustomColor())
+				pPanelName = "screen_obj_dispenser_custom";
+			else
+				pPanelName = "screen_obj_dispenser_red";
 		}
 		else
 		{
-			pPanelName = "screen_obj_dispenser_blue";
+			if(pGameRules && pGameRules->GetBlueTeamHasCustomColor())
+				pPanelName = "screen_obj_dispenser_custom";
+			else
+				pPanelName = "screen_obj_dispenser_blue";
 		}
 	}
 	else
@@ -503,6 +510,7 @@ void CObjectDispenser::Precache()
 
 	PrecacheVGuiScreen( "screen_obj_dispenser_blue" );
 	PrecacheVGuiScreen( "screen_obj_dispenser_red" );
+	PrecacheVGuiScreen( "screen_obj_dispenser_custom" );
 
 	PrecacheScriptSound( "Building_Dispenser.Idle" );
 	PrecacheScriptSound( "Building_Dispenser.GenerateMetal" );

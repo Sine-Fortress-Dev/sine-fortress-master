@@ -103,6 +103,7 @@ public:
 	virtual float	GetTotalTime( void );
 	virtual void	StartPlacement( CTFPlayer *pPlayer );
 	void			StopPlacement( void );
+	void			SetSkin();
 	bool			FindNearestBuildPoint( CBaseEntity *pEntity, CBasePlayer *pBuilder, float &flNearestPoint, Vector &vecNearestBuildPoint, bool bIgnoreChecks = false );
 	bool			FindBuildPointOnPlayer( CTFPlayer *pTFPlayer, CBasePlayer *pBuilder, float &flNearestPoint, Vector &vecNearestBuildPoint );
 	bool			VerifyCorner( const Vector &vBottomCenter, float xOffset, float yOffset );

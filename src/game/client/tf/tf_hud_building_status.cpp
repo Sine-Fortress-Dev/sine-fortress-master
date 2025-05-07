@@ -290,13 +290,29 @@ const char *CBuildingStatusItem::GetBackgroundImage( void )
 		return pResult;
 	}
 
+	CTFGameRules* pGameRules = TFGameRules();
+
 	switch( pLocalPlayer->GetTeamNumber() )
 	{
 	case TF_TEAM_BLUE:
-		pResult = "obj_status_background_blue";
+		if(pGameRules && pGameRules->GetBlueTeamHasCustomColor())
+		{
+			pResult = "obj_status_background_custom";
+		}
+		else
+		{
+			pResult = "obj_status_background_blue";
+		}
 		break;
 	case TF_TEAM_RED:
-		pResult = "obj_status_background_red";
+		if(pGameRules && pGameRules->GetRedTeamHasCustomColor())
+		{
+			pResult = "obj_status_background_custom";
+		}
+		else
+		{
+			pResult = "obj_status_background_red";
+		}
 		break;
 	default:
 		break;
@@ -763,13 +779,29 @@ const char *CBuildingStatusItem_SentryGun::GetBackgroundImage( void )
 		return pResult;
 	}
 
+	CTFGameRules* pGameRules = TFGameRules();
+
 	switch( pLocalPlayer->GetTeamNumber() )
 	{
 	case TF_TEAM_BLUE:
-		pResult = "obj_status_background_tall_blue";
+		if(pGameRules && pGameRules->GetBlueTeamHasCustomColor())
+		{
+			pResult = "obj_status_background_tall_custom";
+		}
+		else
+		{
+			pResult = "obj_status_background_tall_blue";
+		}
 		break;
 	case TF_TEAM_RED:
-		pResult = "obj_status_background_tall_red";
+		if(pGameRules && pGameRules->GetRedTeamHasCustomColor())
+		{
+			pResult = "obj_status_background_tall_custom";
+		}
+		else
+		{
+			pResult = "obj_status_background_tall_red";
+		}
 		break;
 	default:
 		break;
@@ -886,13 +918,29 @@ const char *CBuildingStatusItem_SentryGun_Disposable::GetBackgroundImage( void )
 		return pResult;
 	}
 
+	CTFGameRules* pGameRules = TFGameRules();
+
 	switch( pLocalPlayer->GetTeamNumber() )
 	{
 	case TF_TEAM_BLUE:
-		pResult = "obj_status_background_blue";
+		if(pGameRules && pGameRules->GetBlueTeamHasCustomColor())
+		{
+			pResult = "obj_status_background_custom";
+		}
+		else
+		{
+			pResult = "obj_status_background_blue";
+		}
 		break;
 	case TF_TEAM_RED:
-		pResult = "obj_status_background_red";
+		if(pGameRules && pGameRules->GetRedTeamHasCustomColor())
+		{
+			pResult = "obj_status_background_custom";
+		}
+		else
+		{
+			pResult = "obj_status_background_red";
+		}
 		break;
 	default:
 		break;

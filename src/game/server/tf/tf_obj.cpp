@@ -899,7 +899,7 @@ void CBaseObject::StartPlacement( CTFPlayer *pPlayer )
 	m_vecBuildMaxs -= GetAbsOrigin();
 
 	// Set the skin
-	m_nSkin = ( GetTeamNumber() == TF_TEAM_RED ) ? 0 : 1;
+	SetSkin();
 }
 
 //-----------------------------------------------------------------------------
@@ -908,6 +908,28 @@ void CBaseObject::StartPlacement( CTFPlayer *pPlayer )
 void CBaseObject::StopPlacement( void )
 {
 	UTIL_Remove( this );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: @Kiwano - Sets the building's skin to match team color.
+// 			Applies the custom RGB team color if specified in game rules.
+//			Also sets the mini building skin if needed.
+//-----------------------------------------------------------------------------
+void CBaseObject::SetSkin()
+{
+	int iTeamNum = GetTeamNumber();
+	int iSkin = (iTeamNum == TF_TEAM_RED) ? 0 : 1;
+	CTFGameRules* pGameRules = TFGameRules();
+	if(pGameRules)
+	{
+		if(iTeamNum == TF_TEAM_RED && pGameRules->GetRedTeamHasCustomColor())
+			iSkin = 2;
+		else if(iTeamNum == TF_TEAM_BLUE && pGameRules->GetBlueTeamHasCustomColor())
+			iSkin = 2;
+	}
+	if(m_bMiniBuilding)
+		iSkin += 3;
+	m_nSkin = iSkin;
 }
 
 //-----------------------------------------------------------------------------
@@ -1469,7 +1491,7 @@ bool CBaseObject::StartBuilding( CBaseEntity *pBuilder )
 	if ( IsMiniBuilding() && ( GetType() != OBJ_DISPENSER ) )
 	{
 		// Set the skin after placement mode.
-		m_nSkin = ( GetTeamNumber() == TF_TEAM_RED ) ? 2 : 3;
+		SetSkin();
 	}
 
 	if ( ShouldQuickBuild() )
@@ -3601,7 +3623,7 @@ void CBaseObject::InitializeMapPlacedObject( void )
 	FinishedBuilding();
 
 	// Set the skin
-	m_nSkin = ( GetTeamNumber() == TF_TEAM_RED ) ? 0 : 1;
+	SetSkin();
 }
 
 //-----------------------------------------------------------------------------
