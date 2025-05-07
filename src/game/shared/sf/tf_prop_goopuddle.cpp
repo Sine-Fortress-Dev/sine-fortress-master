@@ -154,7 +154,7 @@ void CTFPropGooPuddle::AffectEntitiesInBounds()
 		if (!pEntity)
 			break;
 
-		if (pEntity == this || !pEntity->IsAlive())
+		if (pEntity == this || !pEntity->IsAlive() || GetAbsOrigin().DistTo(pEntity->GetAbsOrigin()) > m_flRadius)
 			continue;
 
 		//Detect if wall is between player and goo
