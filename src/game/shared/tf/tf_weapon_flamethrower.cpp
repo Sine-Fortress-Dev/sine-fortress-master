@@ -1041,7 +1041,7 @@ void CTFFlameThrower::FireAirBlast( int iAmmoPerShot )
 		fAirblastRefireTimeScale *= 0.5f;
 	}
 
-	m_flNextSecondaryAttack = gpGlobals->curtime + (0.75f * fAirblastRefireTimeScale);	
+	m_flNextSecondaryAttack = gpGlobals->curtime + (0.65f * fAirblastRefireTimeScale);	
 	m_flNextPrimaryAttack = gpGlobals->curtime + (1.0f * fAirblastRefireTimeScale * fAirblastPrimaryRefireTimeScale);
 	m_flResetBurstEffect = gpGlobals->curtime + 0.05f;
 
