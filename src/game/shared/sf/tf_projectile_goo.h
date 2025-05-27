@@ -57,35 +57,31 @@ public:
 	void SetPropGooLifetime( float flPropGooLifetime ) { m_flPropGooLifetime = flPropGooLifetime; }
 	float GetPropGooLifetime( void ) { return m_flPropGooLifetime; }
 
-
-	virtual void	Precache(void);
-	virtual void	Spawn(void);
+	virtual void	Precache(void) OVERRIDE;
+	virtual void	Spawn(void) OVERRIDE;
 
 	void			SetCritical(bool bCritical) { m_bCritical = bCritical; }
-
-	void			GooTouch(CBaseEntity *pOther);
-	virtual void	Expand(void);
-	virtual void	Explode(trace_t* pTrace, int bitsDamageType);
-
-	void			RemoveThis(void);
-
-	virtual bool	IsDeflectable() { return !m_bIsPuddle; }
 
 #ifdef GAME_DLL //GAME_DLL
 
 	static CTFProjectile_Goo* Create(CBaseEntity* pWeapon, const Vector& vecOrigin, const QAngle& vecAngles, const Vector& vecVelocity, CBaseCombatCharacter* pOwner, CBaseEntity* pScorer, const AngularImpulse& angVelocity, const CTFWeaponInfo& weaponInfo);
 
-	virtual void	Detonate(void);
-	virtual void	VPhysicsUpdate(IPhysicsObject* pPhysics);
-	virtual void	VPhysicsCollision(int index, gamevcollisionevent_t* pEvent);
+	void			RemoveThis(void);
 
-	void			PuddleThink(void);
+	virtual void	Detonate(void) OVERRIDE;
+	virtual void	VPhysicsUpdate(IPhysicsObject* pPhysics) OVERRIDE;
+	virtual void	VPhysicsCollision(int index, gamevcollisionevent_t* pEvent) OVERRIDE;
+
+	void			GooTouch(CBaseEntity* pOther);
+	virtual void	Expand(void);
+	virtual void	Explode(trace_t* pTrace, int bitsDamageType);
 
 	// IScorer interface
 	void			SetScorer(CBaseEntity* pScorer);
 	virtual CBasePlayer* GetScorer(void) { return NULL; }
 	virtual CBasePlayer* GetAssistant(void);
 
+	virtual bool	IsDeflectable() OVERRIDE { return !m_bIsPuddle; }
 	virtual void	Deflected(CBaseEntity* pDeflectedBy, Vector& vecDir);
 #else
 

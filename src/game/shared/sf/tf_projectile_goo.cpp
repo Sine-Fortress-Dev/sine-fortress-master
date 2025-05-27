@@ -102,14 +102,139 @@ void CTFProjectile_Goo::Spawn( void )
 	m_bIsPuddle = false;
 
 	BaseClass::Spawn();
+#ifdef GAME_DLL
 	SetTouch( &CTFProjectile_Goo::GooTouch );
-
+#endif
 	// Pumpkin Bombs
 	AddFlag( FL_GRENADE );
 
 	AddSolidFlags( FSOLID_TRIGGER );
 
 	SetGooLevel(1);
+}
+
+#ifdef GAME_DLL
+CTFProjectile_Goo *CTFProjectile_Goo::Create( CBaseEntity *pWeapon, const Vector &vecOrigin, const QAngle &vecAngles, const Vector &vecVelocity, CBaseCombatCharacter *pOwner, CBaseEntity *pScorer, const AngularImpulse &angVelocity, const CTFWeaponInfo &weaponInfo )
+{
+	CTFProjectile_Goo *pGoo = static_cast<CTFProjectile_Goo *>( CBaseEntity::CreateNoSpawn( "tf_projectile_goo", vecOrigin, vecAngles, pOwner ) );
+
+	if ( pGoo )
+	{
+		// Set scorer.
+		pGoo->SetScorer( pScorer );
+
+		// Set firing weapon.
+		pGoo->SetLauncher( pWeapon );
+
+		pGoo->ChangeTeam(pOwner->GetTeamNumber());
+
+		DispatchSpawn( pGoo );
+
+		pGoo->InitGrenade( vecVelocity, angVelocity, pOwner, weaponInfo );
+
+		pGoo->ApplyLocalAngularVelocityImpulse( angVelocity );
+
+		pGoo->m_flDamage.Set(25);
+	}
+
+	return pGoo;
+}
+
+void CTFProjectile_Goo::RemoveThis(void)
+{
+#ifdef CLIENT_DLL
+	ParticleProp()->StopEmission();
+#endif
+	SetThink(&CBaseGrenade::SUB_Remove);
+	SetTouch(NULL);
+#ifdef GAME_DLL
+
+	if (PhysIsInCallback())
+		PhysCallbackRemove(this->GetNetworkable());
+	else
+		UTIL_Remove(this);
+#endif
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CTFProjectile_Goo::Detonate()
+{
+	trace_t		tr;
+	Vector		vecSpot;// trace starts here!
+
+	vecSpot = GetAbsOrigin() + Vector(0, 0, 8);
+	UTIL_TraceLine(vecSpot, vecSpot + Vector(0, 0, -32), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr);
+
+	Explode(&tr, GetDamageType());
+}
+
+void CTFProjectile_Goo::VPhysicsUpdate(IPhysicsObject* pPhysics)
+{
+	if (pPhysics->IsDragEnabled())
+		pPhysics->EnableDrag(false);
+
+	//Skip CTFWeaponBaseGrenadeProj::VphysicsUpdate to avoid trace touches
+	CBaseGrenade::VPhysicsUpdate(pPhysics);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void CTFProjectile_Goo::VPhysicsCollision(int index, gamevcollisionevent_t* pEvent)
+{
+	BaseClass::VPhysicsCollision(index, pEvent);
+
+	int otherIndex = ~index;
+	CBaseEntity* pHitEntity = pEvent->pEntities[otherIndex];
+
+	if (!pHitEntity)
+	{
+		return;
+	}
+
+	if (m_bCritical)
+		EmitSound("Weapon_GooGun.ProjectileImpactWorldCrit");
+	else
+		EmitSound("Weapon_GooGun.ProjectileImpactWorld");
+
+	Vector startPos = GetAbsOrigin();
+	Vector endPos;
+	pEvent->pInternalData->GetContactPoint(endPos);
+
+	Vector endDir = endPos - startPos;
+	endPos += endDir * 5.0f;
+
+	trace_t trace;
+	UTIL_TraceLine(startPos, endPos, MASK_SOLID, this, COLLISION_GROUP_PROJECTILE, &trace);
+
+	//Msg("x: %d, y: %d, z: %d", trace.plane.normal.x, trace.plane.normal.y, trace.plane.normal.z);
+
+	if (VectorsAreEqual(trace.plane.normal, Vector(0, 0, 1), 0.99f))
+	{
+		// Expand into a puddle
+		if (m_nGooType == TF_GOO_TOXIC)
+			Detonate();
+		else
+			Expand();
+	}
+
+	//QAngle vecAngNorm;
+	//QAngle vecAngUp;
+	//VectorAngles(Vector(0, 0, 1), vecAngUp);
+	//VectorAngles(trace.plane.normal, vecAngNorm);
+
+
+
+
+	// TODO: This needs to be redone properly
+	/*if ( pHitEntity->GetMoveType() == MOVETYPE_NONE )
+	{
+		// Blow up
+		SetThink( &CTFProjectile_Jar::Detonate );
+		SetNextThink( gpGlobals->curtime );
+	}*/
 }
 
 //-----------------------------------------------------------------------------
@@ -143,17 +268,17 @@ void CTFProjectile_Goo::GooTouch(CBaseEntity* pOther)
 
 	if (pTrace.fraction < 1.0 && pTrace.surface.flags & SURF_SKY)
 	{
-#ifdef GAME_DLL
 		UTIL_Remove(this);
-#endif
 		return;
 	}
 
 	// Blow up if we hit a player if we are not a puddle
 	if (pOther->IsPlayer())
 	{
-		Explode(&pTrace, GetDamageType());
-		Expand();
+		// Only explode on teammates if we are allowed to (like after the teammate immunity
+		// phase is up) -Vruk
+		if (!(GetTeamNumber() == pOther->GetTeamNumber() && !CanCollideWithTeammates()))
+			Explode(&pTrace, GetDamageType());
 	}
 	// We should bounce off of certain surfaces (resupply cabinets, spawn doors, etc.)
 	else
@@ -197,7 +322,7 @@ void CTFProjectile_Goo::Expand()
 		//UTIL_SetOrigin(this, endpos);
 
 		CTFPropGooPuddle* pProp = (CTFPropGooPuddle*)CBaseEntity::Create("sf_prop_goopuddle", endpos, GetAbsAngles(), GetThrower());
-		
+
 		pProp->SetScorer(GetScorer());
 		pProp->ChangeTeam(GetTeamNumber());
 		pProp->SetGooType(GetGooType());
@@ -225,7 +350,7 @@ void CTFProjectile_Goo::Explode(trace_t* pTrace, int bitsDamageType)
 {
 	// Invisible.
 	//SetModelName( NULL_STRING );
-	
+
 	//Don't change collision rules during callbacks, stupid. (me to myself) -Vruk
 	//AddSolidFlags(FSOLID_NOT_SOLID);
 	m_takedamage = DAMAGE_YES;
@@ -330,143 +455,8 @@ void CTFProjectile_Goo::Explode(trace_t* pTrace, int bitsDamageType)
 		DrawRadius(flRadius);
 	}*/
 #endif
-}
 
-void CTFProjectile_Goo::RemoveThis(void)
-{
-#ifdef CLIENT_DLL
-	ParticleProp()->StopEmission();
-#endif
-	SetThink(&CBaseGrenade::SUB_Remove);
-	SetTouch(NULL);
-#ifdef GAME_DLL
-	
-	if (PhysIsInCallback())
-		PhysCallbackRemove(this->GetNetworkable());
-	else
-		UTIL_Remove(this);
-#endif
-}
-
-#ifdef GAME_DLL
-CTFProjectile_Goo *CTFProjectile_Goo::Create( CBaseEntity *pWeapon, const Vector &vecOrigin, const QAngle &vecAngles, const Vector &vecVelocity, CBaseCombatCharacter *pOwner, CBaseEntity *pScorer, const AngularImpulse &angVelocity, const CTFWeaponInfo &weaponInfo )
-{
-	CTFProjectile_Goo *pGoo = static_cast<CTFProjectile_Goo *>( CBaseEntity::CreateNoSpawn( "tf_projectile_goo", vecOrigin, vecAngles, pOwner ) );
-
-	if ( pGoo )
-	{
-		// Set scorer.
-		pGoo->SetScorer( pScorer );
-
-		// Set firing weapon.
-		pGoo->SetLauncher( pWeapon );
-
-		pGoo->ChangeTeam(pOwner->GetTeamNumber());
-
-		DispatchSpawn( pGoo );
-
-		pGoo->InitGrenade( vecVelocity, angVelocity, pOwner, weaponInfo );
-
-		pGoo->ApplyLocalAngularVelocityImpulse( angVelocity );
-
-		pGoo->m_flDamage.Set(25);
-	}
-
-	return pGoo;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CTFProjectile_Goo::Detonate()
-{
-	trace_t		tr;
-	Vector		vecSpot;// trace starts here!
-
-	vecSpot = GetAbsOrigin() + Vector(0, 0, 8);
-	UTIL_TraceLine(vecSpot, vecSpot + Vector(0, 0, -32), MASK_SHOT_HULL, this, COLLISION_GROUP_NONE, &tr);
-
-	Explode(&tr, GetDamageType());
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Goo splatter think function to do AOE damage over time
-//-----------------------------------------------------------------------------
-void CTFProjectile_Goo::PuddleThink()
-{
-	if (m_flLifeTime < gpGlobals->curtime)
-	{
-		RemoveThis();
-	}
-
-	//SetThink( &CTFProjectile_Goo::PuddleThink );
-	SetNextThink(gpGlobals->curtime);
-
-}
-
-void CTFProjectile_Goo::VPhysicsUpdate(IPhysicsObject* pPhysics)
-{
-	if (pPhysics->IsDragEnabled())
-		pPhysics->EnableDrag(false);
-
-	BaseClass::VPhysicsUpdate(pPhysics);
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CTFProjectile_Goo::VPhysicsCollision(int index, gamevcollisionevent_t* pEvent)
-{
-	BaseClass::VPhysicsCollision(index, pEvent);
-
-	int otherIndex = ~index;
-	CBaseEntity* pHitEntity = pEvent->pEntities[otherIndex];
-
-	if (!pHitEntity)
-	{
-		return;
-	}
-
-	if (m_bCritical)
-		EmitSound("Weapon_GooGun.ProjectileImpactWorldCrit");
-	else
-		EmitSound("Weapon_GooGun.ProjectileImpactWorld");
-
-	Vector startPos = GetAbsOrigin();
-	Vector endPos;
-	pEvent->pInternalData->GetContactPoint(endPos);
-
-	Vector endDir = endPos - startPos;
-	endPos += endDir * 5.0f;
-
-	trace_t trace;
-	UTIL_TraceLine(startPos, endPos, MASK_SOLID, this, COLLISION_GROUP_PROJECTILE, &trace);
-
-	//Msg("x: %d, y: %d, z: %d", trace.plane.normal.x, trace.plane.normal.y, trace.plane.normal.z);
-
-	if (VectorsAreEqual(trace.plane.normal, Vector(0, 0, 1), 0.99f))
-	{
-		// Expand into a puddle
-		if (m_nGooType == TF_GOO_TOXIC)
-			Detonate();
-		Expand();
-	}
-
-	//QAngle vecAngNorm;
-	//QAngle vecAngUp;
-	//VectorAngles(Vector(0, 0, 1), vecAngUp);
-	//VectorAngles(trace.plane.normal, vecAngNorm);
-
-
-
-
-	// TODO: This needs to be redone properly
-	/*if ( pHitEntity->GetMoveType() == MOVETYPE_NONE )
-	{
-		// Blow up
-		SetThink( &CTFProjectile_Jar::Detonate );
-		SetNextThink( gpGlobals->curtime );
-	}*/
+	Expand();
 }
 
 //-----------------------------------------------------------------------------

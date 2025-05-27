@@ -219,7 +219,7 @@ bool CTFGooGun::Deploy(void)
 
 	return BaseClass::Deploy();
 }
-
+#ifdef GAME_DLL
 bool CTFGooGun::AddGoo(CTFProjectile_Goo *pGoo)
 {
 	GooProjectilesHandle hHandle;
@@ -264,7 +264,7 @@ bool CTFGooGun::AddGoo(CTFProjectile_Goo *pGoo)
 	}
 	return true;
 }
-
+#endif
 float CTFGooGun::GetProjectileSpeed(void)
 {
 	float value = GetCurrentCharge();
@@ -312,7 +312,6 @@ bool CTFGooGun::Holster(CBaseCombatWeapon *pSwitchingTo)
 
 	return BaseClass::Holster(pSwitchingTo);
 }
-
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

@@ -46,7 +46,9 @@ public:
 	virtual void	CTFGooGun::ItemBusyFrame(void);
 	virtual bool	CTFGooGun::Holster(CBaseCombatWeapon *pSwitchingTo);
 	virtual bool	Deploy(void);
+#ifdef GAME_DLL
 			bool	AddGoo(CTFProjectile_Goo *pGoo);
+#endif
 	virtual float	GetProjectileSpeed(void);
 	virtual bool	Reload(void);
 	virtual void 	FireGoo( int GooType );
