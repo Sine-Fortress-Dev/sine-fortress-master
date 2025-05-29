@@ -12,6 +12,7 @@
 
 #include "tf_weaponbase_gun.h"
 #include "tf_projectile_goo.h"
+#include "tf_prop_goopuddle.h"
 
 // Client specific.
 #ifdef CLIENT_DLL
@@ -24,6 +25,9 @@
 //
 class CTFGooGun : public CTFWeaponBaseGun, public ITFChargeUpWeapon
 {
+	// to allow only this class to add itself to our goo list
+	friend class CTFProjectile_Goo;
+
 public:
 
 	DECLARE_CLASS( CTFGooGun, CTFWeaponBaseGun );
@@ -35,7 +39,7 @@ public:
 	DECLARE_DATADESC();
 #endif
 
-	CTFGooGun() {}
+	CTFGooGun();
 	~CTFGooGun() {}
 
 	virtual int		GetWeaponID( void ) const			{ return TF_WEAPON_GOOGUN; }
@@ -43,16 +47,18 @@ public:
 	virtual void 	SecondaryAttack(void);
 			//void	SwitchGoo(void);
 	virtual void	WeaponIdle(void);
-	virtual void	CTFGooGun::ItemBusyFrame(void);
-	virtual bool	CTFGooGun::Holster(CBaseCombatWeapon *pSwitchingTo);
+	virtual void	ItemBusyFrame(void);
+	virtual bool	Holster(CBaseCombatWeapon *pSwitchingTo);
 	virtual bool	Deploy(void);
-#ifdef GAME_DLL
-			bool	AddGoo(CTFProjectile_Goo *pGoo);
-#endif
 	virtual float	GetProjectileSpeed(void);
 	virtual bool	Reload(void);
 	virtual void 	FireGoo( int GooType );
 	virtual int		GetGooType();
+
+protected:
+#ifdef GAME_DLL
+	bool			AddGoo(CTFPropGooPuddle* pGoo);
+#endif
 
 public:
 
@@ -63,27 +69,10 @@ public:
 	virtual float		GetCurrentCharge(void);
 	virtual const char 	*GetChargeSound( void ) 	{ return NULL; }
 
-	typedef CHandle<CTFProjectile_Goo>	GooProjectilesHandle;
-	CUtlVector<GooProjectilesHandle>		m_ToxicGooProjectiles;
-	CUtlVector<GooProjectilesHandle>		m_MovementGooProjectiles;
-
-/* 
-//Figure this out sometime if needed
 #ifdef GAME_DLL
-
-private:
-	// This is here so we can network the pipebomb count for prediction purposes
-	CNetworkVar( int,				m_iGooBlobCount );	
+	typedef CHandle<CTFPropGooPuddle>	GooPuddlesHandle;
+	CUtlVector<GooPuddlesHandle>		m_MovementGooPuddles;
 #endif
-
-#ifdef CLIENT_DLL
-	int				m_iGooBlobCount;
-#endif
-
-	// List of active goo globs
-	typedef CHandle<CBaseEntity>	GooGlobHandle;
-	CUtlVector<GooGlobHandle>		m_GooGlobs;
-*/
 
 private:
 

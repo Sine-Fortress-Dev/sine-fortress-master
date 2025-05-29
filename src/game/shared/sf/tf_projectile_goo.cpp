@@ -268,7 +268,7 @@ void CTFProjectile_Goo::GooTouch(CBaseEntity* pOther)
 
 	if (pTrace.fraction < 1.0 && pTrace.surface.flags & SURF_SKY)
 	{
-		UTIL_Remove(this);
+		RemoveThis();
 		return;
 	}
 
@@ -330,6 +330,14 @@ void CTFProjectile_Goo::Expand()
 		pProp->SetDamage(GetDamage());
 		pProp->SetRadius(GetDamageRadius());
 		pProp->SetLifetime(GetPropGooLifetime());
+
+		CTFGooGun* launcher = (CTFGooGun*)GetLauncher();
+		// We may want to spawn a goo without a launcher, so only kill this goo puddle if the launcher says it is invalid
+		if (launcher)
+		{
+			if (!launcher->AddGoo(pProp))
+				pProp->RemoveThis();
+		}
 
 		RemoveThis();
 #endif

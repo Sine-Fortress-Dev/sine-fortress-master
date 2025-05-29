@@ -110,6 +110,8 @@ public:
 	virtual Vector		GroundPuddle(Vector pos, int *tracecount = nullptr);
 	virtual void		PuddleThink();
 
+			void		RemoveThis();
+
 #else
 	CTFPropGooPuddle();
 	~CTFPropGooPuddle();

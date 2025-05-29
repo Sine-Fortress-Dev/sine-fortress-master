@@ -47,7 +47,7 @@ END_DATADESC()
 ConVar sf_googun_ammo_cost_toxic_max("sf_googun_ammo_cost_toxic", "40", FCVAR_REPLICATED, "The maximum ammo the googuns use when fully charged");
 ConVar sf_googun_ammo_cost_movement("sf_googun_ammo_cost_movement", "65", FCVAR_REPLICATED, "The amount of ammo a googun will use to fire a movement goo");
 ConVar sf_googun_goo_max_toxic("sf_googun_goo_max_toxic", "3", FCVAR_REPLICATED, "The number of toxic goos that a scientist can have at one time");
-ConVar sf_googun_goo_max_movement("sf_googun_goo_max_movement", "1", FCVAR_REPLICATED, "The number of movement goos that a scientist can have at one time");
+ConVar sf_googun_goo_max_movement("sf_googun_goo_max_movement", "4", FCVAR_REPLICATED, "The number of movement goos that a scientist can have at one time", true, 1.0f, false, 0.0f);
 ConVar sf_googun_required_charge_percent("sf_googun_required_charge_percent", "0.0", FCVAR_REPLICATED, "The required percent charge of a googun before a goo projectile can be fired", true, 0.0, true, 1.0);
 ConVar sf_googun_max_charge_time("sf_googun_max_charge_time", "3", FCVAR_REPLICATED, "The time it takes to fully charge the googun", true, 0, false, 0);
 ConVar sf_googun_goo_lifetime_max("sf_googun_goo_lifetime_max", "12.0", FCVAR_REPLICATED, "The length of time in seconds that a full charged goo will stay on the ground before disappearing");
@@ -58,10 +58,11 @@ ConVar sf_goo_min_vel("sf_goo_min_vel", "650", FCVAR_REPLICATED, "The velocity o
 ConVar sf_goo_max_vel("sf_goo_max_vel", "1200", FCVAR_REPLICATED, "The velocity of a goo projectile when fired at high charge percent");
 
 
-//=============================================================================
-//
-// Weapon SyringeGun functions.
-//
+
+CTFGooGun::CTFGooGun()
+{
+	m_flChargeBeginTime = 0.0f;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -219,43 +220,41 @@ bool CTFGooGun::Deploy(void)
 
 	return BaseClass::Deploy();
 }
+
+
 #ifdef GAME_DLL
-bool CTFGooGun::AddGoo(CTFProjectile_Goo *pGoo)
+bool CTFGooGun::AddGoo(CTFPropGooPuddle *pGoo)
 {
-	GooProjectilesHandle hHandle;
-	hHandle = pGoo;
+	if (!pGoo)
+		return false;
+
+	GooPuddlesHandle hHandle = pGoo;
 
 	switch (pGoo->GetGooType())
 	{
-		case TF_GOO_JUMP:
-			m_MovementGooProjectiles.AddToTail(hHandle);
+	case TF_GOO_JUMP:
+		{
+			m_MovementGooPuddles.AddToTail(hHandle);
 
-			// If we've gone over the max goo count, remove the oldest
-			if (m_MovementGooProjectiles.Count() > sf_googun_goo_max_movement.GetInt())
+			CTFPropGooPuddle* pTemp = m_MovementGooPuddles[0];
+			// Remove indicies that are no longer alive
+			while (!pTemp && m_MovementGooPuddles.Count() > 0)
 			{
-				CTFProjectile_Goo* pTemp = m_MovementGooProjectiles[0];
-				if (pTemp)
-				{
-					pTemp->RemoveThis();
-				}
-
-				m_MovementGooProjectiles.Remove(0);
+				m_MovementGooPuddles.Remove(0);
+				pTemp = m_MovementGooPuddles[0];
+			}
+			// If we've gone over the max goo count, remove the oldest
+			// this is a while loop because the convar value might change
+			while (pTemp && m_MovementGooPuddles.Count() > sf_googun_goo_max_movement.GetInt())
+			{
+				pTemp->RemoveThis();
+				m_MovementGooPuddles.Remove(0);
+				pTemp = m_MovementGooPuddles[0];
 			}
 			break;
+		}
+			//@Vruk - Currently, we do not keep track of toxic goo
 		case TF_GOO_TOXIC:
-			m_ToxicGooProjectiles.AddToTail(hHandle);
-
-			// If we've gone over the max goo count, remove the oldest
-			if (m_ToxicGooProjectiles.Count() > sf_googun_goo_max_toxic.GetInt())
-			{
-				CTFProjectile_Goo* pTemp = m_ToxicGooProjectiles[0];
-				if (pTemp)
-				{
-					pTemp->RemoveThis();
-				}
-
-				m_ToxicGooProjectiles.Remove(0);
-			}
 			break;
 		default:
 			Warning("Attempted to add goo that is not of known index: %d", pGoo->GetGooType());
@@ -265,6 +264,8 @@ bool CTFGooGun::AddGoo(CTFProjectile_Goo *pGoo)
 	return true;
 }
 #endif
+
+
 float CTFGooGun::GetProjectileSpeed(void)
 {
 	float value = GetCurrentCharge();
@@ -347,6 +348,7 @@ void CTFGooGun::FireGoo( int GooType )
 
 #ifndef GAME_DLL
 	FireProjectile(pPlayer);
+	StopSound(TF_WEAPON_GOOGUN_CHARGE_UP_SOUND);
 #else
 	CTFProjectile_Goo* pProjectile = static_cast<CTFProjectile_Goo*>(FireProjectile(pPlayer));
 
@@ -364,18 +366,8 @@ void CTFGooGun::FireGoo( int GooType )
 
 	//CALL_ATTRIB_HOOK_INT(nMaxGoo, add_max_gooprojectiles);
 
-	//If the goo has an invalid type, delete it and stop the function
-	if (!AddGoo(pProjectile))
-	{
-		pProjectile->RemoveThis();
-		m_flChargeBeginTime = 0;
-		return;
-	}
-#endif
+	m_flChargeBeginTime = 0;
 
-#ifdef CLIENT_DLL
-	StopSound( TF_WEAPON_GOOGUN_CHARGE_UP_SOUND );
-#else
 	pPlayer->SpeakWeaponFire();
 	//CTF_GameStats.Event_PlayerFiredWeapon( pPlayer, IsCurrentAttackACrit() );
 #endif

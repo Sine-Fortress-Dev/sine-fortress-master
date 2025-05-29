@@ -261,7 +261,7 @@ void CTFPropGooPuddle::PuddleThink()
 		}
 		case PROPPUDDLESTATE_DYING:
 		{
-			UTIL_Remove(this);
+			RemoveThis();
 			break;
 		}
 	}
@@ -379,6 +379,22 @@ Vector CTFPropGooPuddle::GroundPuddle(Vector pos, int* tracecount)
 		return Vector(0, 0, 0);
 
 	return tr.endpos + Vector(0.0f, 0.0f, 1.0f);
+}
+
+void CTFPropGooPuddle::RemoveThis(void)
+{
+#ifdef CLIENT_DLL
+	ParticleProp()->StopEmission();
+#endif
+	SetThink(&BaseClass::SUB_Remove);
+	SetTouch(NULL);
+#ifdef GAME_DLL
+
+	if (PhysIsInCallback())
+		PhysCallbackRemove(this->GetNetworkable());
+	else
+		UTIL_Remove(this);
+#endif
 }
 
 #else
