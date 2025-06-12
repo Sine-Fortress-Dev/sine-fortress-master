@@ -770,20 +770,20 @@ bool IsCreepWaveMode( void ) const;
 	Vector GetRedTeamColor(void) { return m_rgbRedColor; }
 	bool GetBlueTeamHasCustomColor() { return m_bBlueCustomColor; }
 	bool GetRedTeamHasCustomColor() { return m_bRedCustomColor; }
-	void CTFGameRules::SetBlueTeamHasCustomColor(bool hasCustom)
+	void SetBlueTeamHasCustomColor(bool hasCustom)
 	{
 		m_bBlueCustomColor.Set(hasCustom);
 	}
-	void CTFGameRules::SetRedTeamHasCustomColor(bool hasCustom)
+	void SetRedTeamHasCustomColor(bool hasCustom)
 	{
 		m_bRedCustomColor.Set(hasCustom);
 	}
 
-	void CTFGameRules::SetBlueTeamColor(Vector color)
+	void SetBlueTeamColor(Vector color)
 	{
 		m_rgbBlueColor.Set(color);
 	}
-	void CTFGameRules::SetRedTeamColor(Vector color)
+	void SetRedTeamColor(Vector color)
 	{
 		m_rgbRedColor.Set(color);
 	}
@@ -792,19 +792,19 @@ bool IsCreepWaveMode( void ) const;
 	const char* GetRedTeamName(void) { return m_pszRedTeamName.Get(); }
 	bool GetBlueTeamHasCustomName() { return m_bBlueCustomName; }
 	bool GetRedTeamHasCustomName() { return m_bRedCustomName; }
-	void CTFGameRules::SetBlueTeamHasCustomName(bool hasCustom)
+	void SetBlueTeamHasCustomName(bool hasCustom)
 	{
 		m_bBlueCustomName.Set(hasCustom);
 	}
-	void CTFGameRules::SetRedTeamHasCustomName(bool hasCustom)
+	void SetRedTeamHasCustomName(bool hasCustom)
 	{
 		m_bRedCustomName.Set(hasCustom);
 	}
-	void CTFGameRules::SetBlueTeamName(const char* name)
+	void SetBlueTeamName(const char* name)
 	{
 		V_strncpy( m_pszBlueTeamName.GetForModify(), name, MAX_TEAM_NAME_LENGTH );
 	}
-	void CTFGameRules::SetRedTeamName(const char* name)
+	void SetRedTeamName(const char* name)
 	{
 		V_strncpy( m_pszRedTeamName.GetForModify(), name, MAX_TEAM_NAME_LENGTH );
 	}

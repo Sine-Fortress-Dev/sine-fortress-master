@@ -7,6 +7,8 @@
 #ifdef GAME_DLL
 #include "tf_player.h"
 #include "iscorer.h"
+#else
+#include "c_tf_player.h"
 #endif
 #include "tf_weaponbase_rocket.h"
 
