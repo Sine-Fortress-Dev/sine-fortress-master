@@ -235,8 +235,8 @@ $Project "Client (SF)"
 			$File	"$SRCDIR\game\client\sf\teamcolorproxy.cpp"
 			$File	"$SRCDIR\game\client\sf\sf_hud_scientistcharge.cpp"
 
-
-
+			$File	"$SRCDIR\game\shared\sf\sf_team_metadata.cpp"
+			$File	"$SRCDIR\game\shared\sf\sf_team_metadata.h"
 		}
 
 		$Folder	"TF"

@@ -20,6 +20,7 @@
 #include "tf_matchmaking_shared.h"
 #include "tf_progression_description.h"
 
+
 #ifdef CLIENT_DLL
 	#include <game/client/iviewport.h>
 	#include "c_tf_player.h"
@@ -111,6 +112,7 @@
 	#include "tf_weapon_laser_pointer.h"
 	#include "effect_dispatch_data.h"
 	#include "tf_fx.h"
+	#include "sf/sf_team_metadata.h"
 	#include "econ_game_account_server.h"
 	#include "tf_logic_halloween_2014.h"
 	#include "tf_obj_sentrygun.h"
@@ -1890,6 +1892,7 @@ void CTFGameRulesProxy::InputSetMapForcedTruceDuringBossFight( inputdata_t &inpu
 	}
 }
 
+/*
 void CTFGameRulesProxy::InputSetBlueTeamCustomColor(inputdata_t& inputdata)
 {
 	Vector vecInput;
@@ -1903,7 +1906,10 @@ void CTFGameRulesProxy::InputSetRedTeamCustomColor(inputdata_t& inputdata)
 	inputdata.value.Vector3D(vecInput);
 	TFGameRules()->SetRedTeamColor(vecInput);
 }
+*/
 
+//we take this out of the mappers' hands, the sf_teamoverrides section will decide whether something has a custom color
+/*
 void CTFGameRulesProxy::InputSetBlueTeamCustomColorActive(inputdata_t& inputdata)
 {
 	TFGameRules()->SetBlueTeamHasCustomColor(inputdata.value.Bool());
@@ -1913,7 +1919,7 @@ void CTFGameRulesProxy::InputSetRedTeamCustomColorActive(inputdata_t& inputdata)
 {
 	TFGameRules()->SetRedTeamHasCustomColor(inputdata.value.Bool());
 }
-
+*/
 void CTFGameRulesProxy::InputSetBlueTeamCustomName(inputdata_t& inputdata)
 {
 	string_t teamname = inputdata.value.StringID();
@@ -1969,8 +1975,13 @@ void CTFGameRulesProxy::Activate()
 
 	ListenForGameEvent( "teamplay_round_win" );
 
+	//do we need any of this? wouldn't it be better to just return the colour values below within the GetColor bit?
+
+	/*
 	Vector blueColor = Vector(97, 145, 200);
 	Vector redColor = Vector(230, 85, 85);
+	
+
 	if (m_bCustomBlueColor)
 	{
 		blueColor.x = m_rgbBlueColor.r;
@@ -1983,11 +1994,12 @@ void CTFGameRulesProxy::Activate()
 		redColor.y = m_rgbRedColor.g;
 		redColor.z = m_rgbRedColor.b;
 	}
+	*/
 
-	TFGameRules()->SetBlueTeamHasCustomColor(m_bCustomBlueColor);
-	TFGameRules()->SetRedTeamHasCustomColor(m_bCustomRedColor);
-	TFGameRules()->SetBlueTeamColor(blueColor);
-	TFGameRules()->SetRedTeamColor(redColor);
+	//TFGameRules()->SetBlueTeamHasCustomColor(m_bCustomBlueColor);
+	//TFGameRules()->SetRedTeamHasCustomColor(m_bCustomRedColor);
+	//TFGameRules()->SetBlueTeamColor(blueColor);
+	//TFGameRules()->SetRedTeamColor(redColor);
 
 	const char* blueName = "BLU";
 	const char* redName = "RED";
@@ -3616,6 +3628,8 @@ CTFGameRules::CTFGameRules()
 #endif
 }
 
+
+
 #ifdef GAME_DLL
 void CTFGameRules::Precache( void )
 {
@@ -3662,6 +3676,85 @@ void CTFGameRules::Precache( void )
 //-----------------------------------------------------------------------------
 //#ifdef GAME_DLL
 //extern void AddHalloweenGiftPositionsForMap( const char *pszMapName, CUtlVector<Vector> &vLocations );
+//#endif
+
+#ifdef GAME_DLL
+//-----------------------------------------------------------------------------
+// Purpose: SF_TEAM_OVERRIDE - adds a CSFTeamOverride's pointer to the list of 
+// pointers that can be accessed for team colours
+//-----------------------------------------------------------------------------
+void CTFGameRules::AddTeamOverrideEnt( CSFTeamOverride* pSFOverride, int iTeam )
+{
+	DevMsg("Message received, TFGameRules has added SFTeamOverride to array for team %i\n",iTeam);
+	//m_vecTeamColorOverrides[iTeam] = pSFOverride;
+	m_vecTeamColorOverrides[iTeam] = pSFOverride;
+}
+#endif
+
+color32 CTFGameRules::GetTeamClassColor(int iTeam, int iClass) //input -1 as the class to get the master team colour
+{
+	color32 retcolor = { -1,-1,-1,-1 }; //no colours - HasCustomColor checks will result in the pre-coloured skins being used
+	
+	//if the relevant sf_teamoverride is disabled or doesn't exist at all
+	if (m_vecTeamColorOverrides[iTeam]->m_bEnabled == false || m_vecTeamColorOverrides[iTeam] == NULL)
+	{
+
+		if (iTeam == TF_TEAM_RED)
+		{
+			DevMsg("Team RED spawned without assigned sf_teamoverride entity!\n");
+			retcolor = SF_COLOR_RED;
+		}
+		else if (iTeam == TF_TEAM_BLUE)
+		{
+			DevMsg("Team BLU spawned without assigned sf_teamoverride entity!\n");
+			retcolor = SF_COLOR_BLUE;
+		}
+		else//got word back from management, we're to keep original skins for mod compatibility
+		{
+			Msg("Team (that is not RED or BLU) spawned without assigned sf_teamoverride entity!\n");
+			retcolor = { 255,255,0, 0 }; //pink to make it clear that mappers have made a mistake by not adding an override 
+		}
+	}
+	else //relevant sf_teamoverride exists and is enabled
+	{
+		//check if per-class colours are enabled
+		if (m_vecTeamColorOverrides[iTeam]->m_bClassColors == true && iClass != -1)
+		{
+			switch (iClass)
+			{
+			case TF_CLASS_SCOUT:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colScout;
+			case TF_CLASS_SOLDIER:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colSoldier;
+			case TF_CLASS_PYRO:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colPyro;
+			case TF_CLASS_DEMOMAN:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colDemoman;
+			case TF_CLASS_HEAVYWEAPONS:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colHeavy;
+			case TF_CLASS_ENGINEER:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colEngineer;
+			case TF_CLASS_MEDIC:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colMedic;
+			case TF_CLASS_SNIPER:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colSniper;
+			case TF_CLASS_SPY:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colSpy;
+			case TF_CLASS_SCIENTIST:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colScientist;
+			case TF_CLASS_RUSHER:
+				retcolor = m_vecTeamColorOverrides[iTeam]->m_colRusher;
+			}
+		}
+		else
+		{
+			retcolor = m_vecTeamColorOverrides[iTeam]->m_colMaster;
+		}
+	}
+
+	return retcolor;
+}
+
 //#endif
 
 void CTFGameRules::LevelInitPostEntity( void )

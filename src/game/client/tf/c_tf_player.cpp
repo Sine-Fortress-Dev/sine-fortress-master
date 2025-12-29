@@ -712,14 +712,14 @@ void C_TFRagdoll::CreateTFRagdoll()
 
 		if ( m_iTeam == TF_TEAM_RED )
 		{
-			if (TFGameRules()->GetRedTeamHasCustomColor())
+			if ( TFGameRules()->GetTeamClassColor(TF_TEAM_RED, -1) != SF_COLOR_RED ) //i don't like having to keep this, personally, but we need to maintain support for original TF2 skin mods (for RED and BLU at least)
 				m_nSkin = 2;
 			else
 				m_nSkin = 0;
 		}
 		else
 		{
-			if (TFGameRules()->GetBlueTeamHasCustomColor())
+			if (TFGameRules()->GetTeamClassColor(TF_TEAM_BLUE, -1) != SF_COLOR_BLUE)
 				m_nSkin = 2;
 			else
 				m_nSkin = 1;

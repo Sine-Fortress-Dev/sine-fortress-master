@@ -58,6 +58,10 @@ extern color32 g_aTeamColors[TF_TEAM_COUNT];
 #define COLOR_TF_RED		Color( 175, 73, 73, 255 )
 #define COLOR_TF_BLUE		Color( 79, 117, 143, 255 )
 
+//temporary until i'm done uprooting the rest of the colour stuff and figuring out what to do with it
+#define SF_COLOR_RED color32{ 230, 85, 85 }
+#define SF_COLOR_BLUE color32{ 97, 145, 200 }
+
 #define CONTENTS_REDTEAM	CONTENTS_TEAM1
 #define CONTENTS_BLUETEAM	CONTENTS_TEAM2
 

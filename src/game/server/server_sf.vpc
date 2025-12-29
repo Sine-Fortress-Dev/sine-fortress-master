@@ -133,6 +133,8 @@ $Project "Server (SF)"
 			$File	"$SRCDIR\game\shared\sf\tf_projectile_energy_laser.cpp"
 			$File	"$SRCDIR\game\shared\sf\tf_projectile_energy_laser.h"
 
+			$File	"$SRCDIR\game\shared\sf\sf_team_metadata.cpp"
+			$File	"$SRCDIR\game\shared\sf\sf_team_metadata.h"
 		}
 
 		$Folder	"TF"

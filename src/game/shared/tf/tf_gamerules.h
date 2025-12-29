@@ -32,6 +32,7 @@
 #else
 #include "tf_player.h"
 #include "entity_soldier_statue.h"
+#include "sf/sf_team_metadata.h"
 #endif
 
 #ifdef CLIENT_DLL
@@ -329,6 +330,8 @@ public:
 
 	CTFGameRules();
 
+
+
 	virtual void	LevelInitPostEntity( void );
 	virtual float	GetRespawnTimeScalar( int iTeam );
 	virtual float	GetRespawnWaveMaxLength( int iTeam, bool bScaleWithNumPlayers = true );
@@ -365,6 +368,14 @@ public:
 
 	virtual bool	PointsMayBeCaptured( void ) OVERRIDE;
 
+	//WHAT
+
+
+	virtual void AddTeamOverrideEnt(CSFTeamOverride* pSFOverride, int iTeam);
+
+	virtual color32 GetTeamClassColor(int iTeam, int iClass);
+
+
 #ifdef GAME_DLL
 public:
 	virtual void	Precache( void );
@@ -383,6 +394,20 @@ public:
 
 	// Called when a new round is off and running
 	virtual void	SetupOnRoundRunning( void );
+
+	//SFTEAMOVERRIDES GO HERE
+	//const CUtlMap< int, CSFTeamOverride* > m_vecTeamColorOverrides[MAX_TEAMS];
+	const CSFTeamOverride* m_vecTeamColorOverrides[MAX_TEAMS];
+
+
+
+	//moved these check functions 
+	/*
+	Vector GetBlueTeamColor(void) { return m_rgbBlueColor; }
+	Vector GetRedTeamColor(void) { return m_rgbRedColor; }
+	bool GetBlueTeamHasCustomColor() { return m_bBlueCustomColor; }
+	bool GetRedTeamHasCustomColor() { return m_bRedCustomColor; }
+	*/ //actually we can just comment them out
 
 	// Called before a new round is started (so the previous round can end)
 	virtual void	PreviousRoundEnd( void );
@@ -770,6 +795,8 @@ bool IsCreepWaveMode( void ) const;
 	Vector GetRedTeamColor(void) { return m_rgbRedColor; }
 	bool GetBlueTeamHasCustomColor() { return m_bBlueCustomColor; }
 	bool GetRedTeamHasCustomColor() { return m_bRedCustomColor; }
+	
+	/*
 	void SetBlueTeamHasCustomColor(bool hasCustom)
 	{
 		m_bBlueCustomColor.Set(hasCustom);
@@ -778,7 +805,10 @@ bool IsCreepWaveMode( void ) const;
 	{
 		m_bRedCustomColor.Set(hasCustom);
 	}
+	*/
 
+	//obsolete functions - use sf_teamoverride instead
+	/*
 	void SetBlueTeamColor(Vector color)
 	{
 		m_rgbBlueColor.Set(color);
@@ -787,7 +817,7 @@ bool IsCreepWaveMode( void ) const;
 	{
 		m_rgbRedColor.Set(color);
 	}
-
+	*/
 	const char* GetBlueTeamName(void) { return m_pszBlueTeamName.Get(); }
 	const char* GetRedTeamName(void) { return m_pszRedTeamName.Get(); }
 	bool GetBlueTeamHasCustomName() { return m_bBlueCustomName; }
