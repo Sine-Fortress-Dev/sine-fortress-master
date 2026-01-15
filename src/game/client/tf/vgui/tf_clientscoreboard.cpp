@@ -1505,7 +1505,7 @@ void CTFClientScoreBoardDialog::UpdatePlayerList()
 						}
 						else
 						{
-							pKeyValues->SetInt( "class", tf_scoreboard_alt_class_icons.GetBool() ? m_iImageClassAlt[iClass + 9] : m_iImageClass[iClass + 9] ); // +9 is to jump ahead to the darker dead icons
+							pKeyValues->SetInt("class", tf_scoreboard_alt_class_icons.GetBool() ? m_iImageClassAlt[iClass + TF_LAST_NORMAL_CLASS - 1] : m_iImageClass[iClass + TF_LAST_NORMAL_CLASS - 1]); // +9 is to jump ahead to the darker dead icons
 						}
 					}
 					else
